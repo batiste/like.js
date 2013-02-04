@@ -1,0 +1,159 @@
+<html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="reset.css" type="text/css">
+<link rel="stylesheet" href="like.css" type="text/css">
+<script src="like.js"></script>
+</head>
+
+<h1>Like.js - CSS classes for style and behavior</h1>
+
+<p>Like.js is a micro framework that implements an event driven model using behavioral CSS classes.</p>
+
+<ol>
+  <li>Events are automatically handled. No bind/unbind are necessary.</li>
+  <li>Less than 4ko in size with no dependencies.</li>
+  <li>Compatible with IE7.</li>
+</ol>
+
+<p>Like.js expose an unique object in the global scope: <strong>like</strong>. This object most important method <em>like.a</em>
+   is used to define a behavior. eg:</p>
+
+<pre>like.a("popup", "click", function(dom, event){...});</pre>
+
+<p>As soon as the <strong>popup</strong> behavior is declared, any element in the page that has the CSS class 
+<strong>like-popup</strong> will respond equaly to the <strong>click</strong> event. 
+In other terms, the callback function you define will be called with the DOM element as a first parameter and the Event as the second.</p>
+
+<div class="snippet">
+
+  <h2>Example 1: basics</h2>
+
+  <div class="html">
+<label>A positive number <input class="like-positive-number" value="wrong value" /></label><br>
+<label id="inserted"></label>
+  </div>
+
+  <h3>HTML</h3>
+  <pre class="html-view"></pre>
+    
+  <script>
+like.a("positive-number", "keyup change like-init like-insert", function(dom, event) {
+  var v = parseInt(dom.value, 10);
+  if(v < 0 || isNaN(v)) {
+    v = 0;
+  }
+  if(dom.value!=v) {
+    dom.value = v;
+  }
+});
+like.insert(like.get("inserted"), 'Inserted <input class="like-positive-number" value="-100" />');
+  </script>
+  <h3>Code</h3>
+  <pre class="code-view"></pre>
+
+
+  <h3>Notes</h3>
+
+  <p>There is 2 pseudo events in like.js.</p>
+
+  <ul>
+  <li><strong>like-init</strong> is triggered immediatly after the behavior as been declared. This is the reason the first
+    input doesn't have the <strong>wrong</strong> value.</li>
+  <li>
+ <strong>like-insert</strong> on the other hand is triggered when new behavioral DOM elements
+     are inserted in the document using <strong>like.insert(dom, html)</strong>.
+  </li>
+  </ul>
+
+</div>
+
+
+<div class="snippet">
+
+  <h2>Example 2: event bubbling</h2>
+
+  <div class="html">
+<span class="like-bubble">
+<span class="like-bubble">
+<span class="like-bubble pop">pop the bubble
+<span class="like-bubble">
+</span>
+</span>
+</span>
+</span>
+  </div>
+
+  <h3>HTML</h3>
+  <pre class="html-view"></pre>
+    
+  <script>
+like.a("bubble", "mouseover mouseout like-init", {
+    mouseover: function(dom, event) {
+      like.addClass(dom, "bubble-over");
+      if(like.hasClass(dom, "pop")) {
+        return false;
+      }
+    },
+    mouseout: function(dom, event) {
+      like.removeClass(dom, "bubble-over");
+      if(like.hasClass(dom, "pop")) {
+        return false;
+      }
+    }
+});
+  </script>
+  <h3>Code</h3>
+  <pre class="code-view"></pre>
+
+  <h3>Notes</h3>
+
+  <ul>
+  <li>like.js, like jQuery, will interupt the bubbling when <strong>false</strong> 
+     is returned in the callback.</li>
+  <li>
+    You can dispatch the different events to different handler by passing 
+    an object of callables instead of the callback function.  
+  </li>
+  </ul>
+
+</div>
+
+
+<div class="snippet">
+
+  <h2>Example 3: a more complex example</h2>
+
+  <div class="html">
+
+  </div>
+
+  <h3>HTML</h3>
+  <pre class="html-view"></pre>
+    
+  <script>
+like.a("", "", function(dom, event) {
+});
+  </script>
+  <h3>Code</h3>
+  <pre class="code-view"></pre>
+
+
+
+</div>
+
+</table>
+<script>
+function safe(h) {
+  return h.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/^\s+|\s+$/g, '');
+}
+
+like.iterate(like.byClass("snippet"), function(dom) {
+  var code = like.byTag("script", dom)[0].innerHTML;
+  like.byClass("code-view", dom)[0].innerHTML = safe(code);
+  var html = like.byClass("html", dom)[0].innerHTML;
+  like.byClass("html-view", dom)[0].innerHTML = safe(html);
+});
+
+</script>
