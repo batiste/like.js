@@ -1,10 +1,33 @@
-
 ;(function(global) {
 
-var doc = document;
-var get = function(id){return doc.getElementById(id)},
-  byClass = function(cls, dom){return (dom || doc).getElementsByClassName(cls)},
+function iterate(obj, fct) {
+  var i;
+  for(i=0; i<obj.length; i++) {
+    if(fct(obj[i]) === false) {
+      return false;
+    }
+  }
+  // sucessful full iteration
+  return true;
+}
+
+var doc = global.document, 
+  get = function(id){return doc.getElementById(id)},
   byTag = function(tag, dom){return (dom || doc).getElementsByTagName(tag)};
+  byClass = function(cls, dom) {
+    var d = (dom || doc);
+    // apparently faster
+    if(d.getElementsByClassName) {return d.getElementsByClassName(cls)};
+    if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
+    // < IE8
+    var accu = [];
+    iterate(byTag("*"), function(el) {
+      if(el.hasClass(cls)) {
+        accu.push(el);
+      }
+    });
+    return accu;
+  };
 
 function Like() {
   // register of callback for every (class, event) couple
@@ -17,13 +40,6 @@ var proto = Like.prototype;
 proto.get = get;
 proto.byClass = byClass;
 proto.byTag = byTag;
-
-function iterate(obj, fct) {
-  var i;
-  for(i=0; i<obj.length; i++) {
-    fct(obj[i]);
-  }
-}
 proto.iterate = iterate;
 
 proto.hasClass = function(dom, cls) {
@@ -63,11 +79,11 @@ proto.execute = function(event) {
       target = target.parentNode;
       continue;
     }
-    iterate(target.className.split(" "), function(cls) {
+    response = iterate(target.className.split(" "), function(cls) {
       if(cls.indexOf("like-") == 0) {
         signature = cls + "|" + event.type;
         if(that.register[signature]) {
-          response = that.register[signature](target, event);      
+           return that.register[signature](target, event);      
         }
       }
     });
@@ -135,7 +151,6 @@ proto.insert = function(dom, html) {
   dom.innerHTML = html;
   this.domInserted(dom);
 }
-
 
 global.like = new Like();
 

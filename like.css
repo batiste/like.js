@@ -29,7 +29,8 @@ p, label, ul, pre, .html{ padding:0.6em 0; }
 
 li { padding:0.2em 0; }
 pre {
-  font-family: 'Ubuntu Mono', courier, sans-serif;
+  font-family: 'Ubuntu Mono', courrier, sans-serif;
+  word-wrap:break-word;
 }
 
 .like-bubble { 

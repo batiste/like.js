@@ -22,8 +22,8 @@
 
 <pre>like.a("popup", "click", function(dom, event){...});</pre>
 
-<p>As soon as the <strong>popup</strong> behavior is declared, any element in the page that has the CSS class 
-<strong>like-popup</strong> will respond equaly to the <strong>click</strong> event. 
+<p>As soon as the <strong>popup</strong> behavior is declared, all elements in the page with CSS class 
+<strong>like-popup</strong> will respond to the <strong>click</strong> event. 
 In other terms, the callback function you define will be called with the DOM element as a first parameter and the Event as the second.</p>
 
 <div class="snippet">
@@ -31,7 +31,7 @@ In other terms, the callback function you define will be called with the DOM ele
   <h2>Example 1: basics</h2>
 
   <div class="html">
-<label>A positive number <input class="like-positive-number" value="wrong value" /></label><br>
+<label>A positive number <input class="like-positive-number" value="wrong" /></label><br>
 <label id="inserted"></label>
   </div>
 
@@ -48,7 +48,8 @@ like.a("positive-number", "keyup change like-init like-insert", function(dom, ev
     dom.value = v;
   }
 });
-like.insert(like.get("inserted"), 'Inserted <input class="like-positive-number" value="-100" />');
+
+like.insert(like.get("inserted"), 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
   </script>
   <h3>Code</h3>
   <pre class="code-view"></pre>
@@ -59,7 +60,7 @@ like.insert(like.get("inserted"), 'Inserted <input class="like-positive-number" 
   <p>There is 2 pseudo events in like.js.</p>
 
   <ul>
-  <li><strong>like-init</strong> is triggered immediatly after the behavior as been declared. This is the reason the first
+  <li><strong>like-init</strong> is triggered immediatly after the behavior as been declared. This is the reason why the first
     input doesn't have the <strong>wrong</strong> value.</li>
   <li>
  <strong>like-insert</strong> on the other hand is triggered when new behavioral DOM elements
