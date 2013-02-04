@@ -11,6 +11,11 @@ function iterate(obj, fct) {
   return true;
 }
 
+function hasClass(dom, cls) {
+  var m = new RegExp("(^|\\s+)" + cls + "(\\s+|$)");
+  return dom.className && dom.className.match(m);
+}
+
 var doc = global.document, 
   get = function(id){return doc.getElementById(id)},
   byTag = function(tag, dom){return (dom || doc).getElementsByTagName(tag)};
@@ -22,7 +27,7 @@ var doc = global.document,
     // < IE8
     var accu = [];
     iterate(byTag("*"), function(el) {
-      if(el.hasClass(cls)) {
+      if(hasClass(el, cls)) {
         accu.push(el);
       }
     });
@@ -41,14 +46,10 @@ proto.get = get;
 proto.byClass = byClass;
 proto.byTag = byTag;
 proto.iterate = iterate;
-
-proto.hasClass = function(dom, cls) {
-  var m = new RegExp("(^|\\s+)" + cls + "(\\s+|$)");
-  return dom.className && dom.className.match(m);
-}
+proto.hasClass = hasClass;
 
 proto.addClass = function(dom, cls) {
-  if(!this.hasClass(dom, cls)) {
+  if(!hasClass(dom, cls)) {
     dom.className = dom.className + " " + cls;
   }
 }
@@ -64,7 +65,7 @@ proto.byClass = function(cls, dom) {
     return d.getElementsByClassName(cls);
   } else if(d.all) {
     iterate(d.all, function(el) {
-      if(that.hasClass(el, cls)) {
+      if(hasClass(el, cls)) {
         accu.push(el);
       }
     });
