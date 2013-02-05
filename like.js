@@ -1,6 +1,7 @@
 ;(function(global) {
 
-function iterate(obj, fct) {
+var doc = global.document, 
+iterate = function (obj, fct) {
   var i;
   for(i=0; i<obj.length; i++) {
     if(fct(obj[i]) === false) {
@@ -9,30 +10,39 @@ function iterate(obj, fct) {
   }
   // sucessful full iteration
   return true;
-}
-
-function hasClass(dom, cls) {
+},
+hasClass = function (dom, cls) {
   var m = new RegExp("(^|\\s+)" + cls + "(\\s+|$)");
   return dom.className && dom.className.match(m);
-}
-
-var doc = global.document, 
-  get = function(id){return doc.getElementById(id)},
-  byTag = function(tag, dom){return (dom || doc).getElementsByTagName(tag)};
-  byClass = function(cls, dom) {
-    var d = (dom || doc);
-    // apparently faster
-    if(d.getElementsByClassName) {return d.getElementsByClassName(cls)};
-    if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
-    // < IE8
-    var accu = [];
-    iterate(byTag("*"), function(el) {
-      if(hasClass(el, cls)) {
-        accu.push(el);
-      }
+},
+get = function(id){return doc.getElementById(id)},
+byTag = function(tag, dom){return (dom || doc).getElementsByTagName(tag)};
+byClass = function(cls, dom) {
+  var d = (dom || doc);
+  // apparently faster
+  if(d.getElementsByClassName) {return d.getElementsByClassName(cls)};
+  if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
+  // < IE8
+  var accu = [];
+  iterate(byTag("*"), function(el) {
+    if(hasClass(el, cls)) {
+      accu.push(el);
+    }
+  });
+  return accu;
+},
+listenTo = function (event, listener, dom) {
+  var d = dom || doc;
+  if(d.addEventListener) {
+    d.addEventListener(event, listener, false);
+  } else if(d.attachEvent) {
+    d.attachEvent("on" + event, function(e) {
+      // IE fix the target
+      e.target = e.target || e.srcElement;
+      return listener(e);
     });
-    return accu;
-  };
+  }
+};
 
 function Like() {
   // register of callback for every (class, event) couple
@@ -47,6 +57,7 @@ proto.byClass = byClass;
 proto.byTag = byTag;
 proto.iterate = iterate;
 proto.hasClass = hasClass;
+proto.listenTo = listenTo;
 
 proto.addClass = function(dom, cls) {
   if(!hasClass(dom, cls)) {
@@ -57,20 +68,6 @@ proto.addClass = function(dom, cls) {
 proto.removeClass = function(dom, cls) {
   var m = new RegExp("(^|\\s+)" + cls + "(\\s+|$)");
   dom.className = dom.className.replace(m, "");
-}
-
-proto.byClass = function(cls, dom) {
-  var d = dom || document, accu, that=this;
-  if(d.getElementsByClassName) {
-    return d.getElementsByClassName(cls);
-  } else if(d.all) {
-    iterate(d.all, function(el) {
-      if(hasClass(el, cls)) {
-        accu.push(el);
-      }
-    });
-  }
-  return accu;
 }
 
 proto.execute = function(event) {
@@ -100,11 +97,9 @@ proto.addEvent = function(className, eventName, callback) {
   // only one event by signature allowed
   if(!this.register[signature]) {
     function listener(e) {
-      // IE fix
-      e.target = e.target || e.srcElement
-      that.execute(e);
+      return that.execute(e);
     }
-    doc.addEventListener(eventName, listener);
+    listenTo(eventName, listener);
     this.register[signature] = callback;
     if(eventName == "like-insert") {
       this.insertClasses.push(className);
