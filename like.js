@@ -12,7 +12,7 @@ iterate = function (obj, fct) {
   return true;
 },
 hasClass = function (dom, cls) {
-  var m = new RegExp("(^|\\s+)" + cls + "(\\s+|$)");
+  var m = new RegExp("\\b" + cls + "\\b");
   return dom.className && dom.className.match(m);
 },
 get = function(id){return doc.getElementById(id)},
@@ -66,7 +66,7 @@ proto.addClass = function(dom, cls) {
 }
 
 proto.removeClass = function(dom, cls) {
-  var m = new RegExp("(^|\\s+)" + cls + "(\\s+|$)");
+  var m = new RegExp("\\b" + cls + "\\b");
   dom.className = dom.className.replace(m, "");
 }
 
@@ -105,7 +105,7 @@ proto.addEvent = function(className, eventName, callback) {
       this.insertClasses.push(className);
     }
     if(eventName == "like-init") {
-      iterate(this.byClass(className), function(el) {
+      iterate(byClass(className), function(el) {
         callback(el, {type:"like-init", target:el});
       });
     }
@@ -134,7 +134,7 @@ proto.domInserted = function(dom) {
   var that = this, signature;
   iterate(this.insertClasses, function(cls) {
     // search for dom element matching those classes
-    iterate(that.byClass(cls, dom), function(el) {
+    iterate(byClass(cls, dom), function(el) {
        signature = cls + "|like-insert";
        if(that.register[signature]) {
          that.register[signature](el, {type:"like-insert", target:el});
@@ -146,6 +146,10 @@ proto.domInserted = function(dom) {
 proto.insert = function(dom, html) {
   dom.innerHTML = html;
   this.domInserted(dom);
+}
+
+proto.data = function(dom, key) {
+  dom.getAttribute("data-" + key);
 }
 
 global.like = new Like();

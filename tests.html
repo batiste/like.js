@@ -127,15 +127,52 @@ like.a("bubble", "mouseover mouseout like-init", {
   <h2>Example 3: a more complex example</h2>
 
   <div class="html">
-
-  </div>
+<table class="like-sum-table">
+<thead>
+<tr><th>Quantity</th><th>Price</th><th>Total</th></tr>
+</thead>
+<tbody>
+  <tr class="like-product-line">
+    <td><input type="text" class="like-positive-number" value="1"></td>
+    <td><span class="price">20.80</span>$</td>
+    <td><span class="total"></span>$</td>
+  </tr>
+  <tr class="like-product-line">
+    <td><input type="text" class="like-positive-number" value="2"></td>
+    <td><span class="price">15.20</span>$</td>
+    <td><span class="total"></span>$</td>
+  </tr>
+  <tr>
+    <td>Grand Total</td>
+    <td></td>
+    <td><span class="grand-total"></span>$</td>
+  </tr>
+</tbody></table>
+</div>
 
   <h3>HTML</h3>
   <pre class="html-view"></pre>
     
   <script>
-like.a("", "", function(dom, event) {
+function roundCent(v) { return Math.round(v * 100) / 100 }
+
+like.a("product-line", "like-init change keyup", function(dom, event) {
+  var quantity = like.byClass("like-positive-number", dom)[0].value;
+  if(quantity=="") {
+    quantity = 0;
+  }
+  var price = parseFloat(like.byClass("price", dom)[0].innerHTML, 10);
+  like.byClass("total", dom)[0].innerHTML = roundCent(price * parseInt(quantity, 10));
 });
+
+like.a("sum-table", "like-init change keyup", function(dom, event) {
+  var grandTotal = 0; 
+  like.iterate(like.byClass("total", dom), function(el) {
+    grandTotal += parseFloat(el.innerHTML, 10);
+  });
+  like.byClass("grand-total")[0].innerHTML = roundCent(grandTotal);
+});
+
   </script>
   <h3>Code</h3>
   <pre class="code-view"></pre>

@@ -27,6 +27,17 @@ em, strong { font-weight:bold }
 
 p, label, ul, pre, .html{ padding:0.6em 0; }
 
+.like-positive-number { width:6em; }
+
+.like-sum-table td, .like-sum-table th {
+  padding:6px 12px;
+}
+
+.like-sum-table .like-product-line {
+  border-bottom:2px #ccc solid;
+  border-top:2px #ccc solid;
+}
+
 li { padding:0.2em 0; }
 pre {
   font-family: 'Ubuntu Mono', courrier, sans-serif;
