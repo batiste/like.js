@@ -11,20 +11,22 @@
 
 <p>Like.js is a micro framework that implements an event driven model using behavioral CSS classes.</p>
 
+<h2>Charateristics</h2>
+
 <ol>
   <li>Events are automatically handled. No bind/unbind are necessary.</li>
-  <li>Less than 4ko in size with no dependencies.</li>
+  <li>Like.js weight less than 4ko with no dependencies.</li>
   <li>Compatible with IE7.</li>
 </ol>
 
-<p>Like.js expose an unique object in the global scope: <strong>like</strong>. This object most important method <em>like.a</em>
-   is used to define a behavior. eg:</p>
+<p>Like.js expose an unique object in the global scope: <strong>like</strong>. The most important method is <em>like.a</em>.
+   It is used to define a behavior associated with a CSS class. eg:</p>
 
 <pre>like.a("popup", "click", function(dom, event){...});</pre>
 
 <p>As soon as the <strong>popup</strong> behavior is declared, all elements in the page with CSS class 
 <strong>like-popup</strong> will respond to the <strong>click</strong> event. 
-In other terms, the callback function you define will be called with the DOM element as a first parameter and the Event as the second.</p>
+The callback function is called with the DOM element as a first parameter and the Event as the second.</p>
 
 <div class="snippet">
 
@@ -49,7 +51,7 @@ like.a("positive-number", "keyup change like-init like-insert", function(dom, ev
   }
 });
 
-like.insert(like.get("inserted"), 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
+like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
   </script>
   <h3>Code</h3>
   <pre class="code-view"></pre>
@@ -92,14 +94,14 @@ like.insert(like.get("inserted"), 'Same but inserted dynamically <input class="l
   <script>
 like.a("bubble", "mouseover mouseout like-init", {
     mouseover: function(dom, event) {
-      like.addClass(dom, "bubble-over");
-      if(like.hasClass(dom, "pop")) {
+      this.addClass("bubble-over");
+      if(this.hasClass("pop")) {
         return false;
       }
     },
     mouseout: function(dom, event) {
-      like.removeClass(dom, "bubble-over");
-      if(like.hasClass(dom, "pop")) {
+      this.removeClass("bubble-over");
+      if(this.hasClass("pop")) {
         return false;
       }
     }
@@ -110,14 +112,18 @@ like.a("bubble", "mouseover mouseout like-init", {
 
   <h3>Notes</h3>
 
-  <ul>
+  <ol>
   <li>like.js, like jQuery, will interupt the bubbling when <strong>false</strong> 
      is returned in the callback.</li>
   <li>
     You can dispatch the different events to different handler by passing 
     an object of callables instead of the callback function.  
   </li>
-  </ul>
+  <li>
+    The keyword <em>this</em> is a <em>Like object</em>. DOM operation operate withing the DOM scope 
+    of the element.
+  </li>
+  </ol>
 
 </div>
 
@@ -157,20 +163,20 @@ like.a("bubble", "mouseover mouseout like-init", {
 function roundCent(v) { return Math.round(v * 100) / 100 }
 
 like.a("product-line", "like-init change keyup", function(dom, event) {
-  var quantity = like.byClass("like-positive-number", dom)[0].value;
+  var quantity = this.byClass("like-positive-number")[0].value;
   if(quantity=="") {
     quantity = 0;
   }
   var price = parseFloat(like.byClass("price", dom)[0].innerHTML, 10);
-  like.byClass("total", dom)[0].innerHTML = roundCent(price * parseInt(quantity, 10));
+  this.byClass("total")[0].innerHTML = roundCent(price * parseInt(quantity, 10));
 });
 
 like.a("sum-table", "like-init change keyup", function(dom, event) {
   var grandTotal = 0; 
-  like.iterate(like.byClass("total", dom), function(el) {
+  this.iterate(this.byClass("total"), function(el) {
     grandTotal += parseFloat(el.innerHTML, 10);
   });
-  like.byClass("grand-total")[0].innerHTML = roundCent(grandTotal);
+  this.byClass("grand-total")[0].innerHTML = roundCent(grandTotal);
 });
 
   </script>
