@@ -14,7 +14,8 @@
 <h2>Charateristics</h2>
 
 <ol>
-  <li>Events are automatically handled. No bind/unbind are necessary.</li>
+  <li>Like.js uses CSS classes to assign behavior to DOM elements.</li>
+  <li>Events are automatically handled by a central event delegation dispatcher.</li>
   <li>Like.js weight less than 4ko with no dependencies.</li>
   <li>Compatible with IE7.</li>
 </ol>
@@ -113,15 +114,15 @@ like.a("bubble", "mouseover mouseout like-init", {
   <h3>Notes</h3>
 
   <ol>
+  <li>
+    The keyword <em>this</em> in the context of the callback is a <em>Like object</em>. DOM operations apply
+    on the current DOM element when applicable.
+  </li>
   <li>like.js, like jQuery, will interupt the bubbling when <strong>false</strong> 
      is returned in the callback.</li>
   <li>
-    You can dispatch the different events to different handler by passing 
-    an object of callables instead of the callback function.  
-  </li>
-  <li>
-    The keyword <em>this</em> is a <em>Like object</em>. DOM operation operate withing the DOM scope 
-    of the element.
+    You can dispatch events to different handler by passing 
+    an object of callables instead of a single callback function.  
   </li>
   </ol>
 
@@ -130,9 +131,10 @@ like.a("bubble", "mouseover mouseout like-init", {
 
 <div class="snippet">
 
-  <h2>Example 3: a more complex example</h2>
+  <h2 id="ex3">Example 3: a more complex example</h2>
 
   <div class="html">
+<form method="get" action="" class="like-not-submit">
 <table class="like-sum-table">
 <thead>
 <tr><th>Quantity</th><th>Price</th><th>Total</th></tr>
@@ -154,6 +156,7 @@ like.a("bubble", "mouseover mouseout like-init", {
     <td><span class="grand-total"></span>$</td>
   </tr>
 </tbody></table>
+</form>
 </div>
 
   <h3>HTML</h3>
@@ -161,13 +164,14 @@ like.a("bubble", "mouseover mouseout like-init", {
     
   <script>
 function roundCent(v) { return Math.round(v * 100) / 100 }
+var money = 120;
 
 like.a("product-line", "like-init change keyup", function(dom, event) {
   var quantity = this.byClass("like-positive-number")[0].value;
   if(quantity=="") {
     quantity = 0;
   }
-  var price = parseFloat(like.byClass("price", dom)[0].innerHTML, 10);
+  var price = parseFloat(this.byClass("price")[0].innerHTML, 10);
   this.byClass("total")[0].innerHTML = roundCent(price * parseInt(quantity, 10));
 });
 
@@ -178,6 +182,7 @@ like.a("sum-table", "like-init change keyup", function(dom, event) {
   });
   this.byClass("grand-total")[0].innerHTML = roundCent(grandTotal);
 });
+
 
   </script>
   <h3>Code</h3>

@@ -81,22 +81,26 @@ proto.removeClass = function(cls, dom) {
  * @param {event} The event
  */
 proto.execute = function(event) {
-  var target = event.target, signature, that=this, response, fun;
+  var target = event.target, signature, that=this, complete, fun, ret;
   while(target) {
     if(!target.className || target.className.indexOf("like-") == -1) {
       target = target.parentNode;
       continue;
     }
-    response = iterate(target.className.split(" "), function(cls) {
+    complete = iterate(target.className.split(" "), function(cls) {
       if(cls.indexOf("like-") == 0) {
         signature = cls + "|" + event.type;
         if(that.register[signature]) {
            fun = that.register[signature];
-           return fun.call(new Like(target), target, event);
+           ret = fun.call(new Like(target), target, event);
+           if(ret === false) {
+              event.preventDefault();
+           }
+           return ret;
         }
       }
     });
-    if(response === false) {
+    if(complete === false) {
       break;
     }
     target = target.parentNode;
@@ -113,7 +117,7 @@ proto.execute = function(event) {
  */
 proto.addEvent = function(className, eventName, callback) {
   var signature = className + "|" + eventName, that=this;
-  // only one event by signature allowed
+  // only one event by signature is allowed
   if(!this.register[signature]) {
     function listener(e) {
       return that.execute(e);
@@ -178,7 +182,9 @@ proto.data = function(dom, key) {
   dom.getAttribute("data-" + key);
 }
 
-global.like = new Like();
+if(!global.like) {
+  global.like = new Like();
+}
 
 }(this))
 
