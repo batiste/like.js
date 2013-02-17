@@ -11,14 +11,25 @@
 
 <p>Like.js is a micro framework that implements an event driven model using behavioral CSS classes.</p>
 
-<h2>Charateristics</h2>
+<h2>Why?</h2>
 
-<ol>
-  <li>Like.js uses CSS classes to assign behavior to DOM elements.</li>
+<p>Because the behavior of similar HTML elements within a Web application will vary,
+a way to diffenciate those elements is required. CSS classes are a natural fit for the task.</p>
+
+<p>The idea is to force the user to think of a prefixed (like-) CSS class for every new behavior.
+This convention comes with some benefits:</p>
+
+<ul>
+  <li>Context specific event binding is discouraged: The behavior definition is declared in an external JavaScript file
+      when behavior usage stays in the document. This is a form of separation of concern.</li>
+  <li>By reading the HTML, you can see which elements have a behavior defined. Nothing can happen
+      without class prefixed by <em>like-</em>.</li>
+  <li>Removing or adding a behavior is as simple as adding/removing the <em>like-</em> CSS class .</li>
   <li>Events are automatically handled by a central event delegation dispatcher.</li>
-  <li>Like.js weight less than 4ko with no dependencies.</li>
-  <li>Compatible with IE7.</li>
-</ol>
+  <li>By not tying any events to specific elements on the page (event delegation), inserting new elements is easy.</li>
+</ul>
+
+<h2>How to use</h2>
 
 <p>Like.js expose an unique object in the global scope: <strong>like</strong>. The most important method is <em>like.a</em>.
    It is used to define a behavior associated with a CSS class. eg:</p>
@@ -31,7 +42,7 @@ The callback function is called with the DOM element as a first parameter and th
 
 <div class="snippet">
 
-  <h2>Example 1: basics</h2>
+  <h2>Example 1: a positive number behavior</h2>
 
   <div class="html">
 <label>A positive number <input class="like-positive-number" value="wrong" /></label><br>
@@ -81,7 +92,7 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
   <div class="html">
 <span class="like-bubble">
 <span class="like-bubble">
-<span class="like-bubble pop">pop the bubble
+<span class="like-bubble pop">pop
 <span class="like-bubble">
 </span>
 </span>

@@ -47,8 +47,9 @@ pre {
 .like-bubble { 
     padding:20px;
     display:inline-block;
-    background:#aaf; 
+    background:#acf; 
     border:2px solid #666;
+    border-radius:200px;
  }  
 
 .bubble-over {
