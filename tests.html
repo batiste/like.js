@@ -179,10 +179,10 @@ function roundCent(v) { return Math.round(v * 100) / 100 }
 like.a("range-number", "likeInit change keyup", function(dom, event) {
   var range = this.data().get("range").split(",");
   var low = parseInt(range[0], 10), 
-      high = parseInt(range[1], 10);
+      high = parseInt(range[1], 10),
       v = parseInt(dom.value);
-  if(v < low) v = low;
-  if(v > high) v = high;
+  if(v < low) {v = low};
+  if(v > high) {v = high};
   if(dom.value != v) {
     dom.value = v;
   }
