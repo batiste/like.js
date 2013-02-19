@@ -29,7 +29,7 @@ This convention comes with some benefits:</p>
   <li>By not tying any events to specific elements on the page (event delegation), inserting new elements is easy.</li>
 </ul>
 
-<h2>How to use</h2>
+<h2>How to use it</h2>
 
 <p>Like.js expose an unique object in the global scope: <strong>like</strong>. The most important method is <em>like.a</em>.
    It is used to define a behavior associated with a CSS class. eg:</p>
@@ -104,7 +104,7 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
   <pre class="html-view"></pre>
     
   <script>
-like.a("bubble", "mouseover mouseout likeInit", {
+like.a("bubble", "mouseover mouseout", {
     mouseover: function(dom, event) {
       this.addClass("bubble-over");
       if(this.hasClass("pop")) {
@@ -152,12 +152,12 @@ like.a("bubble", "mouseover mouseout likeInit", {
 </thead>
 <tbody>
   <tr class="like-product-line">
-    <td><input type="text" class="like-positive-number" value="1"></td>
+    <td><input type="text" class="like-positive-number like-range-number" data-range="0,10" value="1"></td>
     <td><span class="price">20.80</span>$</td>
     <td><span class="total"></span>$</td>
   </tr>
   <tr class="like-product-line">
-    <td><input type="text" class="like-positive-number" value="2"></td>
+    <td><input type="text" class="like-positive-number like-range-number" data-range="0,50" value="2"></td>
     <td><span class="price">15.20</span>$</td>
     <td><span class="total"></span>$</td>
   </tr>
@@ -175,15 +175,24 @@ like.a("bubble", "mouseover mouseout likeInit", {
     
   <script>
 function roundCent(v) { return Math.round(v * 100) / 100 }
-var money = 120;
+
+like.a("range-number", "likeInit change keyup", function(dom, event) {
+  var range = this.data().get("range").split(",");
+  var low = parseInt(range[0], 10), 
+      high = parseInt(range[1], 10);
+      v = parseInt(dom.value);
+  if(v < low) v = low;
+  if(v > high) v = high;
+  if(dom.value != v) {
+    dom.value = v;
+  }
+});
 
 like.a("product-line", "likeInit change keyup", function(dom, event) {
-  var quantity = this.byClass("like-positive-number")[0].value;
-  if(quantity=="") {
-    quantity = 0;
-  }
-  var price = parseFloat(this.byClass("price")[0].innerHTML, 10);
-  this.byClass("total")[0].innerHTML = roundCent(price * parseInt(quantity, 10));
+  var quantity = this.byClass("like-positive-number")[0].value, price;
+  quantity = parseInt(quantity, 10);
+  price = parseFloat(this.byClass("price")[0].innerHTML, 10);
+  this.byClass("total")[0].innerHTML = roundCent(price * quantity);
 });
 
 like.a("sum-table", "likeInit change keyup", function(dom, event) {

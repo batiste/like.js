@@ -1,4 +1,7 @@
-;(function(global) {
+  ;(function(global) {
+/* Like.js module definition 
+   Copyright (C) 2013 Batiste Bieler
+   Under a BSD license */
 
 var doc = global.document, 
 iterate = function (obj, fct) {
@@ -173,8 +176,21 @@ proto.insert = function(dom, html) {
   this.domInserted(dom);
 }
 
-proto.data = function(dom, key) {
-  dom.getAttribute("data-" + key);
+proto.data = function(dom) {
+  var d = dom || this.scope;
+  return {
+    set: function(key, value) {
+      d.setAttribute("data-" + key, value);
+      return this;
+    },
+    get: function(key) {
+      return d.getAttribute("data-" + key);
+    }
+  };
+};
+
+proto.new = function(dom) {
+  return new Like(dom);
 }
 
 if(!global.like) {
