@@ -53,7 +53,7 @@ The callback function is called with the DOM element as a first parameter and th
   <pre class="html-view"></pre>
     
   <script>
-like.a("positive-number", "keyup change like-init like-insert", function(dom, event) {
+like.a("positive-number", "keyup change likeInit likeInsert", function(dom, event) {
   var v = parseInt(dom.value, 10);
   if(v < 0 || isNaN(v)) {
     v = 0;
@@ -74,10 +74,10 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
   <p>There is 2 pseudo events in like.js.</p>
 
   <ul>
-  <li><strong>like-init</strong> is triggered immediatly after the behavior as been declared. This is the reason why the first
+  <li><strong>likeInit</strong> is triggered immediatly after the behavior as been declared. This is the reason why the first
     input doesn't have the <strong>wrong</strong> value.</li>
   <li>
- <strong>like-insert</strong> on the other hand is triggered when new behavioral DOM elements
+ <strong>likeInsert</strong> on the other hand is triggered when new behavioral DOM elements
      are inserted in the document using <strong>like.insert(dom, html)</strong>.
   </li>
   </ul>
@@ -104,7 +104,7 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
   <pre class="html-view"></pre>
     
   <script>
-like.a("bubble", "mouseover mouseout like-init", {
+like.a("bubble", "mouseover mouseout likeInit", {
     mouseover: function(dom, event) {
       this.addClass("bubble-over");
       if(this.hasClass("pop")) {
@@ -177,7 +177,7 @@ like.a("bubble", "mouseover mouseout like-init", {
 function roundCent(v) { return Math.round(v * 100) / 100 }
 var money = 120;
 
-like.a("product-line", "like-init change keyup", function(dom, event) {
+like.a("product-line", "likeInit change keyup", function(dom, event) {
   var quantity = this.byClass("like-positive-number")[0].value;
   if(quantity=="") {
     quantity = 0;
@@ -186,7 +186,7 @@ like.a("product-line", "like-init change keyup", function(dom, event) {
   this.byClass("total")[0].innerHTML = roundCent(price * parseInt(quantity, 10));
 });
 
-like.a("sum-table", "like-init change keyup", function(dom, event) {
+like.a("sum-table", "likeInit change keyup", function(dom, event) {
   var grandTotal = 0; 
   this.iterate(this.byClass("total"), function(el) {
     grandTotal += parseFloat(el.innerHTML, 10);

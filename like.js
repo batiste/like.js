@@ -25,7 +25,7 @@ byClass = function(cls, dom) {
   if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
   // < IE8
   var accu = [];
-  iterate(byTag("*"), function(el) {
+  iterate(byTag("*", d), function(el) {
     if(hasClass(cls, el)) {
       accu.push(el);
     }
@@ -48,7 +48,7 @@ listenTo = function (event, listener, dom) {
 function Like(scope) {
   // register of callback for every (class, event) couple
   this.register = {};
-  // classes that have the like-insert event
+  // classes that have the likeInsert event
   this.insertClasses = [];
   this.scope = scope || doc;
 }
@@ -60,7 +60,7 @@ proto.byTag = byTag;
 proto.iterate = iterate;
 proto.hasClass = hasClass;
 proto.listenTo = listenTo;
-proto.toSring = function(){"Like("+this.scope.toString()+")"};
+proto.toString = function(){return "Like("+this.scope.toString()+")"};
 
 proto.addClass = function(cls, dom) {
   var d = dom || this.scope;
@@ -109,7 +109,7 @@ proto.execute = function(event) {
 
 /**
  * Add a (className, eventName) couple to the event register. 
- * Execute like-init events.
+ * Execute likeInit events.
  *
  * @param {className}  Class name upon to fire the event
  * @param {eventName}  The event name
@@ -124,39 +124,34 @@ proto.addEvent = function(className, eventName, callback) {
     }
     listenTo(eventName, listener);
     this.register[signature] = callback;
-    if(eventName == "like-insert") {
+    if(eventName == "likeInsert") {
       this.insertClasses.push(className);
     }
-    if(eventName == "like-init") {
+    if(eventName == "likeInit") {
       iterate(byClass(className), function(el) {
-        callback.call(new Like(el), el, {type:"like-init", target:el});
+        callback.call(new Like(el), el, {type:"likeInit", target:el});
       });
     }
   }
 }
 
-function eventDispatcher(obj) {
-  return function(dom, event) {
-    if(obj[event.type]) {
-      return obj[event.type].call(new Like(dom), dom, event);
-    }
-  }
-}
-
 /**
- * Add behavior  to the event register. Execute like-init events.
+ * Add behavior  to the event register. Execute likeInit events.
  *
  * @param {name}       name of the behavior
  * @param {reactOn}    space separated list of events
  * @param {callback}   Callback defined by the user
  */
-proto.a = proto.an = function(name, reactOn, callback) {
-  var events = reactOn.split(" "), i, that=this;
-  if(typeof callback !== "function") {
-    callback = eventDispatcher(callback);
-  }
-  iterate(events, function(evt) {
-    that.addEvent("like-"+name, evt, callback);
+proto.a = proto.an = function(name, reactOn, obj) {
+  var that=this, fun;
+  iterate(reactOn.split(" "), function(evt) {
+    if(typeof obj == "object") {
+      if(obj[evt]) {
+        that.addEvent("like-"+name, evt, obj[evt]);
+      }
+    } else {
+      that.addEvent("like-"+name, evt, obj);
+    }
   });
 }
 
@@ -165,9 +160,9 @@ proto.domInserted = function(dom) {
   iterate(this.insertClasses, function(cls) {
     // search for dom element matching those classes
     iterate(byClass(cls, dom), function(el) {
-       signature = cls + "|like-insert";
+       signature = cls + "|likeInsert";
        if(that.register[signature]) {
-         that.register[signature](el, {type:"like-insert", target:el});
+         that.register[signature](el, {type:"likeInsert", target:el});
        }
     });
   });
@@ -183,7 +178,7 @@ proto.data = function(dom, key) {
 }
 
 if(!global.like) {
-  global.like = new Like();
+  global.like = new Like(doc);
 }
 
 }(this))
