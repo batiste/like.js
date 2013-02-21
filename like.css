@@ -20,7 +20,7 @@ h3 {upper-alpha
 
 h1, h2, h3 {
   font-family: 'Roboto', sans-serif;
-  padding:0.5em 0;
+  padding: 1.2em 0 0.6em 0;
 }
 
 em, strong { font-weight:bold }
@@ -55,4 +55,28 @@ pre {
 
 .bubble-over {
    background:#5b7; 
+}
+
+.tooltip {
+  position:absolute;
+  display:none;
+}
+
+.tooltip .content {
+  border-radius:4px;
+  border:1px solid #666;
+  background:#ffffd0;
+  padding:6px;
+  width:200px;
+  margin-bottom:6px;
+}
+
+.tooltip .arrow {
+    position: absolute;
+	  bottom: 0;
+	  left: 50%;
+	  margin-left: -6px;
+	  border-left: 6px solid transparent;
+	  border-right: 6px solid transparent;
+	  border-top: 6px solid #888;
 }

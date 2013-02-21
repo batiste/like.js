@@ -89,6 +89,51 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
 </div>
 
 
+
+<div class="snippet">
+
+  <h2>Example 1.5: tool tip</h2>
+
+<div class="html">
+    <a href="#" class="like-tooltip" data-tooltip="Here is my incredible tooltip!">A link with a tooltip</a>
+</div>
+
+  <h3>HTML</h3>
+
+  <pre class="lang-html prettyprint"></pre>
+    
+  <script>
+var tooltip = document.createElement("div");
+document.body.appendChild(tooltip);
+tooltip.className = "tooltip";
+like.a("tooltip", "mouseover mouseout", {
+    mouseover: function(dom, event) {
+      var rect1, rect2;
+      tooltip.innerHTML = "<div class='content'>"+this.data().get("tooltip")+"</div><span class='arrow'></span>";
+      rect1 = tooltip.getBoundingClientRect();
+      rect2 = dom.getBoundingClientRect();
+      tooltip.style.left = (rect2.left + rect2.width / 2 - rect1.width / 2) + 'px';
+      tooltip.style.top = (rect2.top + pageYOffset - rect1.height) + 'px';
+      tooltip.style.display = 'block';
+    },
+    mouseout: function(dom, event) {
+      tooltip.style.display = 'none';
+    }
+});
+
+
+  </script>
+  <h3>Code</h3>
+  <pre class="lang-js prettyprint"></pre>
+
+
+  <h3>Notes</h3>
+
+  
+
+</div>
+
+
 <div class="snippet">
 
   <h2>Example 2: event bubbling</h2>
@@ -148,8 +193,7 @@ like.a("bubble", "mouseover mouseout", {
 
   <h2 id="ex3">Example 3: a more complex example</h2>
 
-  <div class="html">
-<form method="get" action="" class="like-not-submit">
+<div class="html">
 <table class="like-sum-table">
 <thead>
 <tr><th>Quantity</th><th>Price</th><th>Total</th></tr>
@@ -171,7 +215,6 @@ like.a("bubble", "mouseover mouseout", {
     <td><span class="grand-total"></span>$</td>
   </tr>
 </tbody></table>
-</form>
 </div>
 
   <h3>HTML</h3>
