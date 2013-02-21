@@ -3,7 +3,7 @@ body {
   font-family:sans-serif;
   font-size:16px;
   padding:1% 6%;
-  line-height:1.4;
+  line-height:1.5;
 }
 
 h1{
@@ -43,6 +43,7 @@ li { padding:0.25em 0; }
 pre {
   font-family: 'Ubuntu Mono', courrier, sans-serif;
   word-wrap:break-word;
+  line-height:1.4;
 }
 
 .like-bubble { 

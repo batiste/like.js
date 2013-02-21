@@ -15,31 +15,9 @@
 
 <p>Like.js is a micro framework that implements an event driven model using behavioral CSS classes.</p>
 
-<a href="https://github.com/batiste/like.js">Github page</a>
+<h2>A very quick example</h2>
 
-<h2>Why?</h2>
-
-<p>Because the behavior of similar HTML elements within a Web application will vary,
-a way to diffenciate those elements is required. CSS classes are a natural fit for the task.</p>
-
-<p>The idea is to force the user to think of a prefixed (like-) CSS class for every new behavior.
-This convention comes with some benefits:</p>
-
-<ul>
-  <li>Encourage good design: context specific events are discouraged. The behavior definition is declared in an external JavaScript file
-      when behavior usage stays in the document. This is a form of separation of concern.</li>
-  <li>Easy discovery: When reading the HTML document the classes prefixed by <em>like-</em> will explicity declare a behavior
-      and gives an rough idea to the reader of what the behavior is.</li>
-  <li>Simplicity: Removing or adding a behavior is as simple as adding/removing the <em>like-</em> CSS class. Which can be done
-      in the HTML or the browser debugger.</li>
-  <li>Automatism: Events are automatically handled by a central event delegation dispatcher.</li>
-  <li>Centralisation: Defined behaviors are available in a central registry. They can be removed, added or disabled at will.</li>
-  <li>Ajax is easy: Because there is no events attached to any elements on the page (event delegation on the body), inserting new elements is made easy.</li>
-</ul>
-
-<h2>How to use it</h2>
-
-<p>Like.js expose an unique object in the global scope: <strong>like</strong>. The most important method is <em>like.a</em>.
+<p>Like.js expose an unique object in the global scope: <strong>like</strong>.<br> The most important method is <em>like.a</em>.
    It is used to define a behavior associated with a CSS class. eg:</p>
 
 <pre class="prettyprint lang-js">like.a("popup", "click", function(dom, event){...});</pre>
@@ -47,6 +25,47 @@ This convention comes with some benefits:</p>
 <p>As soon as the <strong>popup</strong> behavior is declared, all elements in the page with CSS class 
 <strong>like-popup</strong> will respond to the <strong>click</strong> event. 
 The callback function is called with the DOM element as a first parameter and the Event as the second.</p>
+
+<h2>Why?</h2>
+
+<p>In Web applications similar HTML elements will have different purpose.
+A way to diffenciate those elements is required. 
+CSS classes are a natural fit for the task when it comes to design.</p>
+
+<p>The idea behind this little framework is to use a prefixed CSS class (<em>like-*</em>) 
+to declare a <em>behavior</em>. A behavior define how an element will react to events.
+The advantages of using those behaviors are the following:</p>
+
+<ul>
+
+  <li><em>It encourage good design by splitting concerns</em>: context specific events are discouraged. The behavior definition is declared in an external JavaScript file
+      wihout being tied to any specifics in the document.
+      Behavior are then used in the document only when needed and where it matters.</li>
+
+  <li><em>Easy discovery</em>: When reading the HTML document the classes prefixed by <em>like-*</em> will explicity declare a behavior
+      and gives the reader an rough idea of what the behavior is doing in this context.</li>
+
+  <li><em>Simplicity</em>: Removing or adding a behavior is as simple as adding/removing the <em>like-*</em> class. Both can be done
+      easily in the HTML document or directly the browser inspector for debugging.</li>
+
+  <li><em>Automatism</em>: Events are automatically handled by a central event delegation dispatcher. You never bind an event
+     to anything again.</li>
+
+  <li><em>Centralisation and inspection</em>: Defined behaviors are available in a central registry. They can inspected, removed, added or disabled at will.</li>
+
+  <li><em>Ajax is easy</em>: Because there is no events attached to any elements on the page (it's 100% event delegation on the body), inserting new elements is made easy.</li>
+</ul>
+
+<h3>Why using classes and not data attributes?</h3>
+
+<p>As I wanted to make a stanalone framework classes seemed a easier fit as the is native support
+   to fetch classes (read faster) in most browsers.</p>
+
+<p>Classes can also be used for styling, if it make sense in the context of the behavior. 
+   Eg. if you have a button behavior, you probably want the button to look the same all accross you 
+   application and therefore you could use the <em>like-button</em> class for style in this case.</p>
+
+
 
 <div class="snippet">
 
