@@ -26,7 +26,7 @@
 <strong>like-popup</strong> will respond to the <strong>click</strong> event. 
 The callback function is called with the DOM element as a first parameter and the event as the second.</p>
 
-<h2>What is it good for?</h2>
+<h2>Why should I care?</h2>
 
 <p>In Web applications similar HTML elements will have different purpose.
 A way to diffenciate those elements is required. 
@@ -34,16 +34,16 @@ CSS classes are a natural fit for the task when it comes to design.</p>
 
 <p>The idea behind this little framework is to use a prefixed CSS class (<em>like-*</em>) 
 to declare a <em>behavior</em>. A behavior definition tie a unique class with one or more events.
-The advantages of using those behaviors are the following:</p>
+The advantages of using behaviors are the following:</p>
 
 <ul>
 
-  <li><em>It encourage good design by splitting concerns</em>: context specific events are discouraged. The behavior definition is declared in an external JavaScript file
-      wihout being tied to any specifics in the document.
-      Behavior are then used in the document only when needed and where it matters.</li>
+  <li><em>It encourage good design and separation of concerns</em>: context specific events are not possible.
+      Behavior definition are declared wihout being tied to any element in the page.
+      Behavior are then used in the document with the CSS class.</li>
 
   <li><em>Easy discovery</em>: When reading the HTML document the classes prefixed by <em>like-*</em> will explicity declare a behavior
-      and gives the reader an rough idea of what the behavior is doing in this context.</li>
+      and gives the reader an rough idea of what the behavior is doing in the context.</li>
 
   <li><em>Simplicity</em>: Removing or adding a behavior is as simple as adding/removing the <em>like-*</em> class. Both can be done
       easily in the HTML document or directly the browser inspector for debugging.</li>
@@ -52,7 +52,7 @@ The advantages of using those behaviors are the following:</p>
 
   <li><em>Centralisation and inspection</em>: Defined behaviors are available in a central registry. They can inspected, removed, added or disabled at will.</li>
 
-  <li><em>Ajax is easy</em>: Because there is no events attached to any elements on the page (it's 100% event delegation on the body), inserting new elements is made easy.</li>
+  <li><em>Ajax is easy</em>: Because there is no events binded on any elements (to the exception of the body where all events are delegated), inserting new elements is effortless.</li>
 </ul>
 
 <h3>Why using classes and not data attributes?</h3>
