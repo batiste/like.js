@@ -11,9 +11,9 @@
 
 
 
-<h1>Like.js - CSS classes for style and behavior</h1>
+<h1>Like.js - CSS classes for behavior</h1>
 
-<p>Like.js is a micro framework that implements an event driven model using behavioral CSS classes.</p>
+<p>Like.js is a micro framework that uses CSS class to declare behaviors. A behavior is a way an element react to events.</p>
 
 <h2>A very quick example</h2>
 
@@ -24,16 +24,16 @@
 
 <p>As soon as the <strong>popup</strong> behavior is declared, all elements in the page with CSS class 
 <strong>like-popup</strong> will respond to the <strong>click</strong> event. 
-The callback function is called with the DOM element as a first parameter and the Event as the second.</p>
+The callback function is called with the DOM element as a first parameter and the event as the second.</p>
 
-<h2>Why?</h2>
+<h2>What is it good for?</h2>
 
 <p>In Web applications similar HTML elements will have different purpose.
 A way to diffenciate those elements is required. 
 CSS classes are a natural fit for the task when it comes to design.</p>
 
 <p>The idea behind this little framework is to use a prefixed CSS class (<em>like-*</em>) 
-to declare a <em>behavior</em>. A behavior define how an element will react to events.
+to declare a <em>behavior</em>. A behavior definition tie a unique class with one or more events.
 The advantages of using those behaviors are the following:</p>
 
 <ul>
@@ -48,8 +48,7 @@ The advantages of using those behaviors are the following:</p>
   <li><em>Simplicity</em>: Removing or adding a behavior is as simple as adding/removing the <em>like-*</em> class. Both can be done
       easily in the HTML document or directly the browser inspector for debugging.</li>
 
-  <li><em>Automatism</em>: Events are automatically handled by a central event delegation dispatcher. You never bind an event
-     to anything again.</li>
+  <li><em>Automatism</em>: Events are automatically handled by a central event delegation dispatcher. Binding events to elements is over.</li>
 
   <li><em>Centralisation and inspection</em>: Defined behaviors are available in a central registry. They can inspected, removed, added or disabled at will.</li>
 
@@ -58,7 +57,7 @@ The advantages of using those behaviors are the following:</p>
 
 <h3>Why using classes and not data attributes?</h3>
 
-<p>As I wanted to make a stanalone framework classes seemed a easier fit as the is native support
+<p>I wanted to make a standalone framework classes seemed a easier fit as the is native support
    to fetch classes (read faster) in most browsers.</p>
 
 <p>Classes can also be used for styling, if it make sense in the context of the behavior. 
