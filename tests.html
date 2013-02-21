@@ -4,7 +4,9 @@
 <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="reset.css" type="text/css">
 <link rel="stylesheet" href="like.css" type="text/css">
+<link rel="stylesheet" href="prettify/prettify.css" type="text/css">
 <script src="like.js"></script>
+<script src="prettify/prettify.js"></script>
 </head>
 
 <h1>Like.js - CSS classes for style and behavior</h1>
@@ -20,13 +22,15 @@ a way to diffenciate those elements is required. CSS classes are a natural fit f
 This convention comes with some benefits:</p>
 
 <ul>
-  <li>Context specific event binding is discouraged: The behavior definition is declared in an external JavaScript file
+  <li>Encourage good design: context specific events are discouraged. The behavior definition is declared in an external JavaScript file
       when behavior usage stays in the document. This is a form of separation of concern.</li>
-  <li>By reading the HTML, you can see which elements have a behavior defined. Nothing can happen
-      without class prefixed by <em>like-</em>.</li>
-  <li>Removing or adding a behavior is as simple as adding/removing the <em>like-</em> CSS class .</li>
-  <li>Events are automatically handled by a central event delegation dispatcher.</li>
-  <li>By not tying any events to specific elements on the page (event delegation), inserting new elements is easy.</li>
+  <li>Easy discovery: When reading the HTML document the classes prefixed by <em>like-</em> will explicity declare a behavior
+      and gives an rough idea to the reader of what the behavior is.</li>
+  <li>Simplicity: Removing or adding a behavior is as simple as adding/removing the <em>like-</em> CSS class. Which can be done
+      in the HTML or the browser debugger.</li>
+  <li>Automatism: Events are automatically handled by a central event delegation dispatcher.</li>
+  <li>Centralisation: Defined behaviors are available in a central registry. They can be removed, added or disabled at will.</li>
+  <li>Ajax is easy: Because there is no events attached to any elements on the page (event delegation on the body), inserting new elements is made easy.</li>
 </ul>
 
 <h2>How to use it</h2>
@@ -50,7 +54,7 @@ The callback function is called with the DOM element as a first parameter and th
   </div>
 
   <h3>HTML</h3>
-  <pre class="html-view"></pre>
+  <pre class="lang-html prettyprint"></pre>
     
   <script>
 like.a("positive-number", "keyup change likeInit likeInsert", function(dom, event) {
@@ -66,7 +70,7 @@ like.a("positive-number", "keyup change likeInit likeInsert", function(dom, even
 like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
   </script>
   <h3>Code</h3>
-  <pre class="code-view"></pre>
+  <pre class="lang-js prettyprint"></pre>
 
 
   <h3>Notes</h3>
@@ -101,7 +105,7 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
   </div>
 
   <h3>HTML</h3>
-  <pre class="html-view"></pre>
+  <pre class="lang-html prettyprint"></pre>
     
   <script>
 like.a("bubble", "mouseover mouseout", {
@@ -120,7 +124,7 @@ like.a("bubble", "mouseover mouseout", {
 });
   </script>
   <h3>Code</h3>
-  <pre class="code-view"></pre>
+  <pre class="lang-js prettyprint"></pre>
 
   <h3>Notes</h3>
 
@@ -171,7 +175,7 @@ like.a("bubble", "mouseover mouseout", {
 </div>
 
   <h3>HTML</h3>
-  <pre class="html-view"></pre>
+  <pre class="lang-html prettyprint"></pre>
     
   <script>
 function roundCent(v) { return Math.round(v * 100) / 100 }
@@ -206,7 +210,7 @@ like.a("sum-table", "likeInit change keyup", function(dom, event) {
 
   </script>
   <h3>Code</h3>
-  <pre class="code-view"></pre>
+  <pre class="lang-js prettyprint"></pre>
 
 
 
@@ -220,9 +224,11 @@ function safe(h) {
 
 like.iterate(like.byClass("snippet"), function(dom) {
   var code = like.byTag("script", dom)[0].innerHTML;
-  like.byClass("code-view", dom)[0].innerHTML = safe(code);
+  like.byClass("lang-js prettyprint", dom)[0].innerHTML = safe(code);
   var html = like.byClass("html", dom)[0].innerHTML;
-  like.byClass("html-view", dom)[0].innerHTML = safe(html);
+  like.byClass("lang-html prettyprint", dom)[0].innerHTML = safe(html);
 });
+
+prettyPrint();
 
 </script>

@@ -2,7 +2,7 @@
 body {
   font-family:sans-serif;
   font-size:16px;
-  padding:1% 4%;
+  padding:1% 6%;
   line-height:1.4;
 }
 
@@ -14,7 +14,7 @@ h2 {
   font-size:24px;
 }
 
-h3 {
+h3 {upper-alpha
   font-size:20px;
 }
 
@@ -38,7 +38,8 @@ p, label, ul, pre, .html{ padding:0.6em 0; }
   border-top:2px #ccc solid;
 }
 
-li { padding:0.2em 0; }
+ol, ul {list-style-type:lower-alpha;}
+li { padding:0.25em 0; }
 pre {
   font-family: 'Ubuntu Mono', courrier, sans-serif;
   word-wrap:break-word;
