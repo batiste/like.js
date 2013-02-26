@@ -2,14 +2,15 @@
 <head>
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="reset.css" type="text/css">
-<link rel="stylesheet" href="like.css" type="text/css">
-<link rel="stylesheet" href="prettify/prettify.css" type="text/css">
-<script src="js/like.js"></script>
+<link rel="stylesheet" href="css/reset.css" type="text/css">
+<link rel="stylesheet" href="css/font.css" type="text/css">
+<link rel="stylesheet" href="css/like.css" type="text/css">
+<link rel="stylesheet" href="css/prettify.css" type="text/css">
+<script src="like.js"></script>
 <script src="prettify/prettify.js"></script>
 </head>
 
-
+<body class="intro">
 
 <h1>Like.js - Introduction</h1>
 
@@ -17,7 +18,7 @@
 
 <p>Like.js is a simple standalone library. It is small and easy to understand. I created it for fun and also out
 of frustration dealing with big and messy JavaScript applications. It's experimental and I never used
-it for anything real yet but it reflects they way I go about developing a web site with jQuery right now.</p>
+it for anything real yet but it reflects they way I would go about developing a web site with jQuery right now.</p>
 
 <h2>A very simple example</h2>
 
@@ -30,6 +31,8 @@ it for anything real yet but it reflects they way I go about developing a web si
 <strong>like-popup</strong> will respond to the <strong>click</strong> event. 
 The callback function is called with the DOM element as a first parameter and the event as the second.</p>
 
+<p>Want to know how this works? <a href="doc.html#like.js">Have look at the documentation</a></p>
+
 <h2>What's good about it?</h2>
 
 <p>Behaviors forces you to define how a DOM element will behave without having the real object on hand.
@@ -38,12 +41,11 @@ This and the way the code is architectured brings some benefits to some more nai
 <ul>
 
   <li><em>Separation of concern</em>: context specific behaviors are not possible.
-      Behavior definition are declared wihout being tied to any element in the page. In fact they are
-      only element they need is the body of the page.</li>
+      Behavior definition are declared wihout being tied to any element in the page.</li>
 
-  <li><em>Inversion of responsability</em>: It's easier to customize a behavior using the data attribute of
-      the HTML element than creating new behaviors for every use case. 
-      This helps reusing behaviors and put the settings where it matters: close
+  <li><em>Inversion of responsability</em>: It's easy to customize a behavior for a particular DOM element
+      using the data attributes of this same element.
+      This helps creating reusable behaviors and put the settings where it matters: close
       to the HTML elements that uses them.</li>
 
   <li><em>Easy discovery</em>: When reading the HTML document classes like <em>like-popup</em> 
@@ -61,7 +63,7 @@ This and the way the code is architectured brings some benefits to some more nai
          They can be inspected, removed, added or disabled at will.</li>
 
   <li><em>Dynamic creation of elements is easy</em>: Because there is no events binded on any elements 
-       (to the exception of the body where all events are delegated), inserting new elements in the HTML document 
+       (to the exception of the document where all events are delegated), inserting new elements in the HTML document 
         effortless.</li>
 </ul>
 
@@ -145,7 +147,7 @@ tooltip.className = "tooltip";
 like.a("tooltip", "mouseover mouseout", {
     mouseover: function(dom, event) {
       var rect1, rect2;
-      tooltip.innerHTML = "<div class='content'>"+this.data().get("tooltip")+"</div><span class='arrow'></span>";
+      tooltip.innerHTML = "<div class='content'>"+this.data("tooltip")+"</div><span class='arrow'></span>";
       rect1 = tooltip.getBoundingClientRect();
       rect2 = dom.getBoundingClientRect();
       tooltip.style.left = (rect2.left + rect2.width / 2 - rect1.width / 2) + 'px';
@@ -263,7 +265,7 @@ like.a("bubble", "mouseover mouseout", {
 function roundCent(v) { return Math.round(v * 100) / 100 }
 
 like.a("range-number", "likeInit change keyup", function(dom, event) {
-  var range = this.data().get("range").split(",");
+  var range = this.data("range").split(",");
   var low = parseInt(range[0], 10), 
       high = parseInt(range[1], 10),
       v = parseInt(dom.value);
@@ -318,3 +320,6 @@ prettyPrint();
 </script>
 
 <a href="https://github.com/batiste/like.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+</body>
+</html>
