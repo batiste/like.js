@@ -241,12 +241,12 @@ like.a("bubble", "mouseover mouseout", {
 </thead>
 <tbody>
   <tr class="like-product-line">
-    <td><input type="text" class="like-positive-number like-range-number" data-range="0,10" value="1"></td>
+    <td><input type="text" class="like-positive-number like-range-number" data-range="json:[0,10]" value="1"></td>
     <td><span class="price">20.80</span>$</td>
     <td><span class="total"></span>$</td>
   </tr>
   <tr class="like-product-line">
-    <td><input type="text" class="like-positive-number like-range-number" data-range="0,50" value="2"></td>
+    <td><input type="text" class="like-positive-number like-range-number" data-range="json:[0,50]" value="2"></td>
     <td><span class="price">15.20</span>$</td>
     <td><span class="total"></span>$</td>
   </tr>
@@ -265,9 +265,9 @@ like.a("bubble", "mouseover mouseout", {
 function roundCent(v) { return Math.round(v * 100) / 100 }
 
 like.a("range-number", "likeInit change keyup", function(dom, event) {
-  var range = this.data("range").split(",");
-  var low = parseInt(range[0], 10), 
-      high = parseInt(range[1], 10),
+  var range = this.data("range");
+  var low = range[0], 
+      high = range[1],
       v = parseInt(dom.value);
   if(v < low) {v = low};
   if(v > high) {v = high};

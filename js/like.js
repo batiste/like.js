@@ -6,7 +6,7 @@
 
 // some internal variables
 var hasClass, byId, byTag, byClass, iterate, 
-  doc = global.document, listenTo, proto; 
+  doc = global.document, listenTo, proto;
 
 // ** {{{ Like constructor }}} **
 //
@@ -55,19 +55,19 @@ proto.hasClass = hasClass = function (cls, dom) {
 //
 // Return a DOM element given it's ID
 proto.byId = byId = function(id, dom){
-  return (dom || this.scope || doc).getElementById(id)};
+  return (dom || this.scope).getElementById(id)};
 
 // ** {{{ like.byTag(tagName, dom) }}} **
 //
 // Return a list of DOM element given a tag name.
 proto.byTag = byTag = function(tag, dom){return (
-  dom || this.scope || doc).getElementsByTagName(tag)};
+  dom || this.scope).getElementsByTagName(tag)};
 
 // ** {{{ like.byClass(className, dom) }}} **
 //
 // Return a list of DOM element given a class name.
 proto.byClass = byClass = function(cls, dom) {
-  var d = dom || this.scope || doc;
+  var d = dom || this.scope;
   // apparently faster
   if(d.getElementsByClassName) {return d.getElementsByClassName(cls)};
   if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
@@ -85,7 +85,7 @@ proto.byClass = byClass = function(cls, dom) {
 //
 // Listen to a particuliar even in a cross browser way.
 proto.listenTo = listenTo = function (event, listener, dom) {
-  var d = dom || this.scope || doc;
+  var d = dom || this.scope;
   if(d.addEventListener) {
     d.addEventListener(event, listener, false);
   } else if(d.attachEvent) {
@@ -151,7 +151,7 @@ proto.execute = function(event) {
   }
 }
 
-// ** {{{ like.addEvent(className, eventName, callback) }}} **
+// ** {{{ like.registerEvent(className, eventName, callback) }}} **
 //
 // Add a (className, eventName) couple to the event registry. 
 // Execute likeInit events and register the className in the insert table if likeInsert is present.
@@ -159,7 +159,7 @@ proto.execute = function(event) {
 // * **className**  Class name upon to fire the event
 // * **eventName**  The event name
 // * **callback**   Callback defined by the user
-proto.addEvent = function(className, eventName, callback) {
+proto.registerEvent = function(className, eventName, callback) {
   var signature = className + "|" + eventName, that=this;
   // only one event by signature is allowed
   if(!this.register[signature]) {
@@ -192,10 +192,10 @@ proto.a = proto.an = function(name, reactOn, obj) {
   iterate(reactOn.split(/[\s]+/), function(evt) {
     if(typeof obj == "object") {
       if(obj[evt]) {
-        that.addEvent("like-"+name, evt, obj[evt]);
+        that.registerEvent("like-"+name, evt, obj[evt]);
       }
     } else {
-      that.addEvent("like-"+name, evt, obj);
+      that.registerEvent("like-"+name, evt, obj);
     }
   });
 }
@@ -230,17 +230,44 @@ proto.insert = function(dom, html) {
   this.domInserted(dom);
 }
 
-// ** {{{ like.data(dom) }}} **
+// ** {{{ like.data(key, [value]) }}} **
 // 
-// Return the content of the data attribute given the key
+// Set or get the data attribute of the current element
+proto.data = function(key, value) {
+  if(typeof value == "undefined") {
+    return this.getData(key);
+  } else {
+    this.setData(key, value);
+  }
+}
 
-proto.data = function(key, dom) {
-  var d = dom || this.scope;
-  return d.getAttribute("data-" + key);
-};
+// ** {{{ like.setData(key, value) }}} **
+// 
+// Save some content into the current dom element.
+proto.setData = function(key, value, dom) {
+  var d = this.scope || dom;
+  if(typeof value == "undefined") {
+    return d.removeAttribute("data-" + key);
+  }
+  d.setAttribute("data-" + key, "json:"+JSON.stringify(value));
+}
 
+// ** {{{ like.getData(key) }}} **
+// 
+// Return the content stored in the current element.
+proto.getData = function(key, dom) {
+  var d = (this.scope || dom);
+  var v = d.getAttribute("data-" + key);
+  if(v && v.indexOf("json:") === 0) {
+    return JSON.parse(v.slice(5));
+  }
+  return v;
+}
+
+// ** {{{ like.here(dom) }}} **
+//
 // Shortcut to create a new Like object
-proto.create = function(dom) {
+proto.here = function(dom) {
   return new Like(dom);
 }
 
