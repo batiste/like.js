@@ -66,18 +66,6 @@ some benefits:</p>
 
 </ul>
 
-<h3>Why using classes and not data attributes?</h3>
-
-<p>To make a standalone framework classes seemed an easier fit because native support
-   to fetch classes is common and fast.</p>
-
-<p>Classes can also be used for styling, if it make sense in the context of the behavior. 
-   Eg. if you have a button behavior, you probably want the button to look the same all accross you 
-   application and therefore you could use the <em>like-button</em> class for style in this case.</p>
-
-
-<h3>Can I use it instead of jQuery?</h3>
-
 
 
 <div class="snippet">
@@ -312,17 +300,32 @@ like.a("sum-table", "likeInit change keyup", function(dom, event) {
   </li>
   </ol>
 
-<h3>What's I want to do next?</h3>
+<h3>Why using classes and not data attributes?</h3>
+
+<p>To make a standalone framework classes seemed an easier fit because native support
+   to fetch classes is common and fast.</p>
+
+<p>Classes can also be used for styling, if it make sense in the context of the behavior. 
+   Eg. if you have a button behavior, you probably want the button to look the same all accross you 
+   application and therefore you could use the <em>like-button</em> class for style in this case.</p>
+
+
+<h3>Can I use it right now?</h3>
+
+<p>I woudn't recommend it. Like.js is very feature limited and not very well tested. 
+Right now I would use it as an inspiration and build something similar with jQuery.</p>
+
+<h3>What's next?</h3>
 
 <ol>
   <li>Custom events. Event driven programmation.</li>
   <li>Callback of hell avoidance mechanisms.</li>
-  <li>Any other ideas?</li>
 </ol>
+
 
 <h3>Help?</h3>
 
-<p>Want to help or ask for more features? <a href="https://batiste.dosimple.ch/like.js">Visit the github page.</a></p>
+<p>Want to help or ask for more features? <a href="https://batiste.dosimple.ch/like.js">please help yourself.</a></p>
 
 <script>
 function safe(h) {
