@@ -6,7 +6,7 @@
 
 // some internal variables
 var hasClass, byId, byTag, byClass, iterate, 
-  doc = global.document, listenTo, proto;
+  doc = global.document, proto;
 
 // ** {{{ Like constructor }}} **
 //
@@ -84,7 +84,7 @@ proto.byClass = byClass = function(cls, dom) {
 // ** {{{ like.listenTo(event, listener, dom) }}} **
 //
 // Listen to a particuliar even in a cross browser way.
-proto.listenTo = listenTo = function (event, listener, dom) {
+proto.listenTo = function (event, listener, dom) {
   var d = dom || this.scope;
   if(d.addEventListener) {
     d.addEventListener(event, listener, false);
@@ -166,13 +166,13 @@ proto.registerEvent = function(className, eventName, callback) {
     function listener(e) {
       return that.execute(e);
     }
-    listenTo(eventName, listener);
+    this.listenTo(eventName, listener);
     this.register[signature] = callback;
     if(eventName == "likeInsert") {
       this.insertClasses.push(className);
     }
     if(eventName == "likeInit") {
-      iterate(byClass(className), function(el) {
+      iterate(that.byClass(className), function(el) {
         callback.call(new Like(el), el, {type:"likeInit", target:el});
       });
     }

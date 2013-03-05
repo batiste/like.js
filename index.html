@@ -14,11 +14,11 @@
 
 <h1>Like.js - Introduction</h1>
 
-<p>Like.js is micro framework used to define <em>behaviors</em>. A behavior declare how one or many HTML elements will react to some events.</p>
+<p>Like.js is a micro framework used to define <em>behaviors</em>. A behavior declare how one or many HTML elements will react to some events.</p>
 
-<p>Like.js is a simple standalone library. It is small and easy to understand. I created it for fun and also out
-of frustration dealing with big and messy JavaScript applications. It's experimental and I never used
-it for anything real yet but it reflects they way I would go about developing a web site with jQuery right now.</p>
+<p>Like.js is a small, understandable, standalone library. I created it for fun and also out
+of frustration dealing with big and <a href="http://callbackhell.com/">messy JavaScript applications</a>. It's experimental and I never used
+it for anything real yet but it reflects they way I would go about developing a web application with jQuery right now.</p>
 
 <h2>A very simple example</h2>
 
@@ -35,18 +35,10 @@ The callback function is called with the DOM element as a first parameter and th
 
 <h2>What's good about it?</h2>
 
-<p>Behaviors forces you to define how a DOM element will behave without having the real object on hand.
-This and the way the code is architectured brings some benefits to some more naive jQuery usage:</p>
+<p>The fact that Like.js define behaviors using classes brings
+some benefits:</p>
 
 <ul>
-
-  <li><em>Separation of concern</em>: context specific behaviors are not possible.
-      Behavior definition are declared wihout being tied to any element in the page.</li>
-
-  <li><em>Inversion of responsability</em>: It's easy to customize a behavior for a particular DOM element
-      using the data attributes of this same element.
-      This helps creating reusable behaviors and put the settings where it matters: close
-      to the HTML elements that uses them.</li>
 
   <li><em>Easy discovery</em>: When reading the HTML document classes like <em>like-popup</em> 
       will immediatly reveal a behavior and gives the reader an idea of what the behavior is doing
@@ -63,18 +55,28 @@ This and the way the code is architectured brings some benefits to some more nai
          They can be inspected, removed, added or disabled at will.</li>
 
   <li><em>Dynamic creation of elements is easy</em>: Because there is no events binded on any elements 
-       (to the exception of the document where all events are delegated), inserting new elements in the HTML document 
-        effortless.</li>
+       (to the exception of the document where all events are delegated), inserting new elements in the HTML document is
+        effortless (Ajax, Pjax).</li>
+
+
+  <li><em>Configuration in the DOM</em>: As many elements might share the same behavior, it's
+      natural to customize the behavior effects using the element attributes.
+      This helps creating reusable behaviors and put the settings where it matters: close
+      to the HTML elements that uses them.</li>
+
 </ul>
 
 <h3>Why using classes and not data attributes?</h3>
 
-<p>I wanted to make a standalone framework classes seemed a easier fit as the is native support
-   to fetch classes (read faster) in most browsers.</p>
+<p>To make a standalone framework classes seemed an easier fit because native support
+   to fetch classes is common and fast.</p>
 
 <p>Classes can also be used for styling, if it make sense in the context of the behavior. 
    Eg. if you have a button behavior, you probably want the button to look the same all accross you 
    application and therefore you could use the <em>like-button</em> class for style in this case.</p>
+
+
+<h3>Can I use it instead of jQuery?</h3>
 
 
 
@@ -167,11 +169,16 @@ like.a("tooltip", "mouseover mouseout", {
 
   <h3>Notes</h3>
 
-  <p>
-    Like.js enables you to dispatch events to different handler by passing 
+  <ol><li>
+    <em>like.a</em> enables you to dispatch events to different handler by passing 
     an object of callables instead of a single callback function.  
-  </p>
-
+  </li>
+  <li>
+    The keyword <em>this</em> in the context of a behavior is a Like object scoped with
+    the current DOM element. Therefore you can use methods like <em>data</em> or <em>byClass</em>
+    or any other Like methods.  
+  </li>
+  </ol>
 </div>
 
 
@@ -221,10 +228,7 @@ like.a("bubble", "mouseover mouseout", {
   </li>
   <li>like.js, like jQuery, will interupt the bubbling when <strong>false</strong> 
      is returned in the callback.</li>
-  <li>
-    You can dispatch events to different handler by passing 
-    an object of callables instead of a single callback function.  
-  </li>
+
   </ol>
 
 </div>
@@ -232,7 +236,7 @@ like.a("bubble", "mouseover mouseout", {
 
 <div class="snippet">
 
-  <h2 id="ex3">Example 4: more complete interactions</h2>
+  <h2 id="ex3">Example 4: multiple behaviors interactions</h2>
 
 <div class="html">
 <table class="like-sum-table">
@@ -259,8 +263,9 @@ like.a("bubble", "mouseover mouseout", {
 </div>
 
   <h3>HTML</h3>
+
   <pre class="lang-html prettyprint"></pre>
-    
+
   <script>
 function roundCent(v) { return Math.round(v * 100) / 100 }
 
@@ -298,6 +303,22 @@ like.a("sum-table", "likeInit change keyup", function(dom, event) {
 
 </div>
 
+
+  <h3>Notes</h3>
+
+  <ol>
+  <li>
+    If you prefix a data atribute with <em>json:</em> like.data will parse the JSON and return it automatically. 
+  </li>
+  </ol>
+
+<h3>What's I want to do next?</h3>
+
+<ol>
+  <li>Custom events. Event driven programmation.</li>
+  <li>Callback of hell avoidance mechanisms.</li>
+  <li>Any other ideas?</li>
+</ol>
 
 <h3>Help?</h3>
 
