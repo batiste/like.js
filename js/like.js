@@ -185,11 +185,19 @@ proto.registerEvent = function(className, eventName, callback) {
 // Add behavior to the event register.
 // 
 // * **name**       Name of the behavior
-// * **reactOn**    Space separated list of events
+// * **reactOn**    Space separated list of events, or a map of callbacks.
 // * **obj**        Callback defined by the user, or a map of callbacks.
 
 proto.a = proto.an = function(name, reactOn, obj) {
-  var that=this;
+  var that=this, key;
+  if(typeof reactOn == "object") {
+    for(key in reactOn) {
+      if(reactOn.hasOwnProperty(key)) {
+        that.registerEvent("like-"+name, key, reactOn[key]);
+      }
+    }
+    return;
+  }
   iterate(reactOn.split(/[\s]+/), function(evt) {
     if(typeof obj == "object") {
       if(obj[evt]) {

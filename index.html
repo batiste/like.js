@@ -134,7 +134,7 @@ like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="
 var tooltip = document.createElement("div");
 document.body.appendChild(tooltip);
 tooltip.className = "tooltip";
-like.a("tooltip", "mouseover mouseout", {
+like.a("tooltip", {
     mouseover: function(dom, event) {
       var rect1, rect2;
       tooltip.innerHTML = "<div class='content'>"+this.data("tooltip")+"</div><span class='arrow'></span>";
@@ -159,7 +159,7 @@ like.a("tooltip", "mouseover mouseout", {
 
   <ol><li>
     <em>like.a</em> enables you to dispatch events to different handler by passing 
-    an object of callables instead of a single callback function.  
+    directly an map of callables instead of a string of events.  
   </li>
   <li>
     The keyword <em>this</em> in the context of a behavior is a Like object scoped with
@@ -189,7 +189,7 @@ like.a("tooltip", "mouseover mouseout", {
   <pre class="lang-html prettyprint"></pre>
     
   <script>
-like.a("bubble", "mouseover mouseout", {
+like.a("bubble", {
     mouseover: function(dom, event) {
       this.addClass("bubble-over");
       if(this.hasClass("pop")) {
