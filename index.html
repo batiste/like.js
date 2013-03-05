@@ -1,0 +1,349 @@
+<html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/reset.css" type="text/css">
+<link rel="stylesheet" href="css/font.css" type="text/css">
+<link rel="stylesheet" href="css/like.css" type="text/css">
+<link rel="stylesheet" href="css/prettify.css" type="text/css">
+<script src="js/like.js"></script>
+<script src="prettify/prettify.js"></script>
+</head>
+
+<body class="intro">
+
+<h1>Like.js - Introduction</h1>
+
+<p>Like.js is a micro framework used to define <em>behaviors</em>. A behavior declare how one or many HTML elements will react to some events.</p>
+
+<p>Like.js is a small, understandable, standalone library. I created it for fun and also out
+of frustration dealing with big and <a href="http://callbackhell.com/">messy JavaScript applications</a>. It's experimental and I never used
+it for anything real yet but it reflects they way I would go about developing a web application with jQuery right now.</p>
+
+<h2>A very simple example</h2>
+
+<p>Like.js expose an unique object in the global scope: <strong>like</strong>.<br> The most important method is <em>like.a</em>.
+   It is used to define a behavior associated with a CSS class. eg:</p>
+
+<pre class="prettyprint lang-js">like.a("popup", "click", function(dom, event){...});</pre>
+
+<p>As soon as the <strong>popup</strong> behavior is declared, all elements in the page with the CSS class 
+<strong>like-popup</strong> will respond to the <strong>click</strong> event. 
+The callback function is called with the DOM element as a first parameter and the event as the second.</p>
+
+<p>Want to know how this works? <a href="doc.html#js/like.js">Have look at the documentation</a></p>
+
+<h2>What's good about it?</h2>
+
+<p>The fact that Like.js define behaviors using classes brings
+some benefits:</p>
+
+<ul>
+
+  <li><em>Easy discovery</em>: When reading the HTML document classes like <em>like-popup</em> 
+      will immediatly reveal a behavior and gives the reader an idea of what the behavior is doing
+      in this context.</li>
+
+  <li><em>Simplicity</em>: Removing or adding a behavior is as simple as adding/removing 
+      the <em>like-popup</em> class. Both can be done
+      easily in the HTML document or directly the browser inspector for debugging.</li>
+
+  <li><em>Automatism</em>: Events are automatically handled by a central event delegation dispatcher.
+         You never bind events to any elements.</li>
+
+  <li><em>Centralisation and inspection</em>: Defined behaviors are available in a central registry. 
+         They can be inspected, removed, added or disabled at will.</li>
+
+  <li><em>Dynamic creation of elements is easy</em>: Because there is no events binded on any elements 
+       (to the exception of the document where all events are delegated), inserting new elements in the HTML document is
+        effortless (Ajax, Pjax).</li>
+
+
+  <li><em>Configuration in the DOM</em>: As many elements might share the same behavior, it's
+      natural to customize the behavior effects using the element attributes.
+      This helps creating reusable behaviors and put the settings where it matters: close
+      to the HTML elements that uses them.</li>
+
+</ul>
+
+
+
+<div class="snippet">
+
+  <h2>Example 1: a positive number behavior</h2>
+
+  <div class="html">
+<label>A positive number <input class="like-positive-number" value="wrong" /></label><br>
+<label id="inserted"></label>
+  </div>
+
+  <h3>HTML</h3>
+
+  <p>This first example illustrate the use of several events include 2 pseudo events. Note that
+   events are separated by one space.</p>
+
+  <pre class="lang-html prettyprint"></pre>
+    
+  <script>
+like.a("positive-number", "keyup change likeInit likeInsert", function(dom, event) {
+  var v = parseInt(dom.value, 10);
+  if(v < 0 || isNaN(v)) {
+    v = 0;
+  }
+  if(dom.value!=v) {
+    dom.value = v;
+  }
+});
+
+like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
+  </script>
+  <h3>Code</h3>
+  <pre class="lang-js prettyprint"></pre>
+
+
+  <h3>Notes</h3>
+
+  <p>There is 2 pseudo events in like.js.</p>
+
+  <ul>
+  <li><strong>likeInit</strong> is triggered immediatly after the behavior as been declared. This is the reason why the first
+    input doesn't have the <strong>wrong</strong> value.</li>
+  <li>
+ <strong>likeInsert</strong> on the other hand is triggered when new behavioral DOM elements
+     are inserted in the document using <strong>like.insert(dom, html)</strong>.
+  </li>
+  </ul>
+
+</div>
+
+
+
+<div class="snippet">
+
+  <h2>Example 2: tool tip</h2>
+
+<div class="html">
+    <a href="#" class="like-tooltip" data-tooltip="Here is my incredible tooltip!">A link with a tooltip</a>
+</div>
+
+  <h3>HTML</h3>
+
+  <pre class="lang-html prettyprint"></pre>
+    
+  <script>
+var tooltip = document.createElement("div");
+document.body.appendChild(tooltip);
+tooltip.className = "tooltip";
+like.a("tooltip", {
+    mouseover: function(dom, event) {
+      var rect1, rect2;
+      tooltip.innerHTML = "<div class='content'>"+this.data("tooltip")+"</div><span class='arrow'></span>";
+      rect1 = tooltip.getBoundingClientRect();
+      rect2 = dom.getBoundingClientRect();
+      tooltip.style.left = (rect2.left + rect2.width / 2 - rect1.width / 2) + 'px';
+      tooltip.style.top = (rect2.top + pageYOffset - rect1.height) + 'px';
+      tooltip.style.display = 'block';
+    },
+    mouseout: function(dom, event) {
+      tooltip.style.display = 'none';
+    }
+});
+
+
+  </script>
+  <h3>Code</h3>
+  <pre class="lang-js prettyprint"></pre>
+
+
+  <h3>Notes</h3>
+
+  <ol><li>
+    <em>like.a</em> enables you to dispatch events to different handler by passing 
+    directly an map of callables instead of a string of events.  
+  </li>
+  <li>
+    The keyword <em>this</em> in the context of a behavior is a Like object scoped with
+    the current DOM element. Therefore you can use methods like <em>data</em> or <em>byClass</em>
+    or any other Like methods.  
+  </li>
+  </ol>
+</div>
+
+
+<div class="snippet">
+
+  <h2>Example 3: event bubbling</h2>
+
+  <div class="html">
+<span class="like-bubble">
+<span class="like-bubble">
+<span class="like-bubble pop">pop
+<span class="like-bubble">
+</span>
+</span>
+</span>
+</span>
+  </div>
+
+  <h3>HTML</h3>
+  <pre class="lang-html prettyprint"></pre>
+    
+  <script>
+like.a("bubble", {
+    mouseover: function(dom, event) {
+      this.addClass("bubble-over");
+      if(this.hasClass("pop")) {
+        return false;
+      }
+    },
+    mouseout: function(dom, event) {
+      this.removeClass("bubble-over");
+      if(this.hasClass("pop")) {
+        return false;
+      }
+    }
+});
+  </script>
+  <h3>Code</h3>
+  <pre class="lang-js prettyprint"></pre>
+
+  <h3>Notes</h3>
+
+  <ol>
+  <li>
+    The keyword <em>this</em> in the context of the callback is a <em>Like object</em>. DOM operations apply
+    on the current DOM element when applicable.
+  </li>
+  <li>like.js, like jQuery, will interupt the bubbling when <strong>false</strong> 
+     is returned in the callback.</li>
+
+  </ol>
+
+</div>
+
+
+<div class="snippet">
+
+  <h2 id="ex3">Example 4: multiple behaviors interactions</h2>
+
+<div class="html">
+<table class="like-sum-table">
+<thead>
+<tr><th>Quantity</th><th>Price</th><th>Total</th></tr>
+</thead>
+<tbody>
+  <tr class="like-product-line">
+    <td><input type="text" class="like-positive-number like-range-number" data-range="json:[0,10]" value="1"></td>
+    <td><span class="price">20.80</span>$</td>
+    <td><span class="total"></span>$</td>
+  </tr>
+  <tr class="like-product-line">
+    <td><input type="text" class="like-positive-number like-range-number" data-range="json:[0,50]" value="2"></td>
+    <td><span class="price">15.20</span>$</td>
+    <td><span class="total"></span>$</td>
+  </tr>
+  <tr>
+    <td>Grand Total</td>
+    <td></td>
+    <td><span class="grand-total"></span>$</td>
+  </tr>
+</tbody></table>
+</div>
+
+  <h3>HTML</h3>
+
+  <pre class="lang-html prettyprint"></pre>
+
+  <script>
+function roundCent(v) { return Math.round(v * 100) / 100 }
+
+like.a("range-number", "likeInit change keyup", function(dom, event) {
+  var range = this.data("range");
+  var low = range[0], 
+      high = range[1],
+      v = parseInt(dom.value);
+  if(v < low) {v = low};
+  if(v > high) {v = high};
+  if(dom.value != v) {
+    dom.value = v;
+  }
+});
+
+like.a("product-line", "likeInit change keyup", function(dom, event) {
+  var quantity = this.byClass("like-positive-number")[0].value, price;
+  quantity = parseInt(quantity, 10);
+  price = parseFloat(this.byClass("price")[0].innerHTML, 10);
+  this.byClass("total")[0].innerHTML = roundCent(price * quantity);
+});
+
+like.a("sum-table", "likeInit change keyup", function(dom, event) {
+  var grandTotal = 0; 
+  this.iterate(this.byClass("total"), function(el) {
+    grandTotal += parseFloat(el.innerHTML, 10);
+  });
+  this.byClass("grand-total")[0].innerHTML = roundCent(grandTotal);
+});
+  </script>
+  <h3>Code</h3>
+  <pre class="lang-js prettyprint"></pre>
+
+
+
+</div>
+
+
+  <h3>Notes</h3>
+
+  <ol>
+  <li>
+    If you prefix a data atribute with <em>json:</em> like.data will parse the JSON and return it automatically. 
+  </li>
+  </ol>
+
+<h3>Why using classes and not data attributes?</h3>
+
+<p>To make a standalone framework classes seemed an easier fit because native support
+   to fetch classes is common and fast.</p>
+
+<p>Classes can also be used for styling, if it make sense in the context of the behavior. 
+   Eg. if you have a button behavior, you probably want the button to look the same all accross you 
+   application and therefore you could use the <em>like-button</em> class for style in this case.</p>
+
+
+<h3>Can I use it right now?</h3>
+
+<p>I woudn't recommend it. Like.js is very feature limited and not very well tested. 
+Right now I would use it as an inspiration and build something similar with jQuery.</p>
+
+<h3>What's next?</h3>
+
+<ol>
+  <li>Custom events. Event driven programmation.</li>
+  <li>Callback of hell avoidance mechanisms.</li>
+</ol>
+
+
+<h3>Help?</h3>
+
+<p>Want to help or ask for more features? <a href="https://batiste.dosimple.ch/like.js">please help yourself.</a></p>
+
+<script>
+function safe(h) {
+  return h.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/^\s+|\s+$/g, '');
+}
+
+like.iterate(like.byClass("snippet"), function(dom) {
+  var code = like.byTag("script", dom)[0].innerHTML;
+  like.byClass("lang-js prettyprint", dom)[0].innerHTML = safe(code);
+  var html = like.byClass("html", dom)[0].innerHTML;
+  like.byClass("lang-html prettyprint", dom)[0].innerHTML = safe(html);
+});
+
+prettyPrint();
+
+</script>
+
+<a href="https://github.com/batiste/like.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+</body>
+</html>
