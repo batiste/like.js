@@ -11,8 +11,8 @@ var hasClass, byId, byTag, byClass, iterate,
 // ** {{{ Like constructor }}} **
 //
 // A Like object can take a DOM object as a scope. 
-// The scope is used within DOM relative methods when no specific
-// dom is sepcified.
+// The scope is used within DOM relative methods when the
+// the dom parameter is left unspecified.
 // by default the scope is the document.
 function Like(scope) {
   // register of callback for every (class|event) couple
@@ -30,11 +30,12 @@ proto.toString = function(){return "Like("+this.scope.toString()+")"};
 // ** {{{ like.iterate(object, callback) }}} **
 //
 // Iterate over an Array, calling a callback for each item.
-// Returning false intterupt the iteration.
+// Returning false interrupt the iteration.
 proto.iterate = iterate = function (obj, fct) {
   var i;
   for(i=0; i<obj.length; i++) {
     if(fct(obj[i]) === false) {
+      // end of the iteration
       return false;
     }
   }
@@ -44,7 +45,7 @@ proto.iterate = iterate = function (obj, fct) {
 
 // ** {{{ like.hasClass(className, dom) }}} **
 //
-// Return true if the given DOM element has given class.
+// Return true if the given DOM element has a given class.
 proto.hasClass = hasClass = function (cls, dom) {
   var d = (dom || this.scope);
   var m = new RegExp("\\b" + cls + "\\b");
