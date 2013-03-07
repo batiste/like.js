@@ -224,7 +224,7 @@ like.a("bubble", {
 
 <div class="snippet">
 
-  <h2 id="ex3">Example 4: multiple behaviors interactions</h2>
+  <h2 id="ex3">Example 4: multiple behaviors interactions, usage of event driven programmation</h2>
 
 <div class="html">
 <table class="like-sum-table">
@@ -267,7 +267,7 @@ like.a("range-number", "likeInit change keyup", function(dom, event) {
   if(dom.value != v) {
     dom.value = v;
   }
-  this.trigger("quantityChanged", {rain:"like-sum-table"});
+  this.trigger("quantityChanged");
 });
 
 like.a("product-line", "likeInit quantityChanged", function(dom, event) {
@@ -275,9 +275,10 @@ like.a("product-line", "likeInit quantityChanged", function(dom, event) {
   quantity = parseInt(quantity, 10);
   price = parseFloat(this.byClass("price")[0].innerHTML, 10);
   this.byClass("total")[0].innerHTML = roundCent(price * quantity);
+  this.trigger("totalChanged");
 });
 
-like.a("sum-table", "likeInit quantityChanged", function(dom, event) {
+like.a("sum-table", "likeInit totalChanged", function(dom, event) {
   var grandTotal = 0;
   this.iterate(this.byClass("total"), function(el) {
     grandTotal += parseFloat(el.innerHTML, 10);

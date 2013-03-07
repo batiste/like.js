@@ -128,8 +128,12 @@ proto.removeClass = function(cls, dom) {
 // **event** The event to execute
 proto.execute = function(event, rainClass) {
   var target = event.target, that=this, complete, fun, ret;
+  var evr = that.eventRegister[event.type];
+  if(!evr) {
+    return;
+  }
   while(target) {
-    if(hasClass(rainClass, target)) {
+    if(rainClass && hasClass(rainClass, target)) {
       this.rain(target, event);
       return;
     }
@@ -139,8 +143,7 @@ proto.execute = function(event, rainClass) {
     }
     complete = iterate(target.className.split(" "), function(cls) {
       if(cls.indexOf("like-") == 0) {
-        var evr = that.eventRegister[event.type];
-        if(evr && evr[cls]) {
+        if(evr[cls]) {
            fun = evr[cls];
            ret = fun.call(new Like(target), target, event);
            if(ret === false) {
@@ -173,9 +176,9 @@ proto.rain = function(dom, event) {
 };
 
 proto.trigger = function(name, opt) {
-  var id = this.id(), d = (opt && opt.dom) || this.scope;
+  var d = (opt && opt.dom) || this.scope;
   var evt = {type:name, target:d, preventDefault:function(){}};
-  this.execute(evt, (opt && opt.rain));
+  like.execute(evt, (opt && opt.rain));
 }
 
 proto.propagateDown = function(event, down) {
