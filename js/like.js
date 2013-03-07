@@ -16,10 +16,8 @@ var hasClass, byId, byTag, byClass, iterate,
 // by default the scope is the document.
 function Like(scope) {
   // register of callback for every (class|event) couple
-  this.register = {};
   this.eventRegister = {};
   // classes that have the likeInsert event
-  this.insertClasses = [];
   this.scope = scope || doc;
 }
 
@@ -34,10 +32,24 @@ proto.toString = function(){return "Like("+this.scope.toString()+")"};
 // Returning false interrupt the iteration.
 proto.iterate = iterate = function (obj, fct) {
   var i;
-  for(i=0; i<obj.length; i++) {
-    if(fct(obj[i]) === false) {
-      // end of the iteration
-      return false;
+  if(!obj) {
+    return false;
+  }
+  if(obj.hasOwnProperty("length")) {
+    for(i=0; i<obj.length; i++) {
+      if(fct(obj[i], i) === false) {
+        // end of the iteration
+        return false;
+      }    
+    }
+  } else {
+    for(i in obj) {
+      if(obj.hasOwnProperty(i)) {
+        if(fct(obj[i], i) === false) {
+          // end of the iteration
+          return false;
+        }
+      }
     }
   }
   // sucessful full iteration
@@ -163,16 +175,14 @@ proto.execute = function(event, rainClass) {
 proto.rain = function(dom, event) {
   // TODO: must use a global register
   var evr = like.eventRegister[event.type], fun;
-  for(cls in evr) {
+  iterate(evr, function(cls) {
     if(hasClass(cls, dom)) {
       evr[cls].call(new Like(dom), dom, event);
     }
-    if(evr.hasOwnProperty(cls)) {
-      this.iterate(byClass(cls, dom), function(el) {
-        evr[cls].call(new Like(el), el, event);
-      });
-    }
-  };
+    iterate(byClass(cls, dom), function(el) {
+      evr[cls].call(new Like(el), el, event);
+    });
+  });
 };
 
 proto.trigger = function(name, opt) {
@@ -206,9 +216,6 @@ proto.registerEvent = function(className, eventName, callback) {
     }
     this.listenTo(eventName, listener);
     this.eventRegister[eventName][className] = callback;
-    if(eventName == "likeInsert") {
-      this.insertClasses.push(className);
-    }
     if(eventName == "likeInit") {
       iterate(that.byClass(className), function(el) {
         callback.call(new Like(el), el, {type:"likeInit", target:el});
@@ -228,11 +235,9 @@ proto.registerEvent = function(className, eventName, callback) {
 proto.a = proto.an = function(name, reactOn, obj) {
   var that=this, key;
   if(typeof reactOn == "object") {
-    for(key in reactOn) {
-      if(reactOn.hasOwnProperty(key)) {
-        that.registerEvent("like-"+name, key, reactOn[key]);
-      }
-    }
+    iterate(reactOn, function(fct, evt) {
+        that.registerEvent("like-"+name, evt, fct);
+    });
     return;
   }
   iterate(reactOn.split(/[\s]+/), function(evt) {
@@ -252,12 +257,11 @@ proto.a = proto.an = function(name, reactOn, obj) {
 // 
 // **dom** Fire the likeInsert events on all elements within a given DOM element.
 proto.domInserted = function(dom) {
-  var that = this, signature, fun;
-  // TODO: this could removed
-  iterate(this.insertClasses, function(cls) {
+  var that = this, signature, fun, evr = this.eventRegister["likeInsert"];
+  iterate(evr, function(fct, cls) {
     // search for dom element matching those classes
     iterate(byClass(cls, dom), function(el) {
-       var fun = that.eventRegister["likeInsert"][cls];
+       var fun = evr[cls];
        if(fun) {
          fun.call(new Like(el), el, {type:"likeInsert", target:el});
        }
