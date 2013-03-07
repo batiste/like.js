@@ -17,6 +17,7 @@ var hasClass, byId, byTag, byClass, iterate,
 function Like(scope) {
   // register of callback for every (class|event) couple
   this.register = {};
+  this.eventRegister = {};
   // classes that have the likeInsert event
   this.insertClasses = [];
   this.scope = scope || doc;
@@ -125,18 +126,22 @@ proto.removeClass = function(cls, dom) {
 // there is a match the event is executed.
 //
 // **event** The event to execute
-proto.execute = function(event) {
-  var target = event.target, signature, that=this, complete, fun, ret;
+proto.execute = function(event, rainClass) {
+  var target = event.target, that=this, complete, fun, ret;
   while(target) {
+    if(hasClass(rainClass, target)) {
+      this.rain(target, event);
+      return;
+    }
     if(!target.className || target.className.indexOf("like-") == -1) {
       target = target.parentNode;
       continue;
     }
     complete = iterate(target.className.split(" "), function(cls) {
       if(cls.indexOf("like-") == 0) {
-        signature = cls + "|" + event.type;
-        if(that.register[signature]) {
-           fun = that.register[signature];
+        var evr = that.eventRegister[event.type];
+        if(evr && evr[cls]) {
+           fun = evr[cls];
            ret = fun.call(new Like(target), target, event);
            if(ret === false) {
               event.preventDefault();
@@ -152,6 +157,31 @@ proto.execute = function(event) {
   }
 }
 
+proto.rain = function(dom, event) {
+  // TODO: must use a global register
+  var evr = like.eventRegister[event.type], fun;
+  for(cls in evr) {
+    if(hasClass(cls, dom)) {
+      evr[cls].call(new Like(dom), dom, event);
+    }
+    if(evr.hasOwnProperty(cls)) {
+      this.iterate(byClass(cls, dom), function(el) {
+        evr[cls].call(new Like(el), el, event);
+      });
+    }
+  };
+};
+
+proto.trigger = function(name, opt) {
+  var id = this.id(), d = (opt && opt.dom) || this.scope;
+  var evt = {type:name, target:d, preventDefault:function(){}};
+  this.execute(evt, (opt && opt.rain));
+}
+
+proto.propagateDown = function(event, down) {
+  
+}
+
 // ** {{{ like.registerEvent(className, eventName, callback) }}} **
 //
 // Add a (className, eventName) couple to the event registry. 
@@ -162,13 +192,17 @@ proto.execute = function(event) {
 // * **callback**   Callback defined by the user
 proto.registerEvent = function(className, eventName, callback) {
   var signature = className + "|" + eventName, that=this;
-  // only one event by signature is allowed
-  if(!this.register[signature]) {
+  var evr = this.eventRegister[eventName];
+  if(!evr) {
+    evr = this.eventRegister[eventName] = {};
+  }
+  // only one class by type of event
+  if(!evr[className]) {
     function listener(e) {
       return that.execute(e);
     }
     this.listenTo(eventName, listener);
-    this.register[signature] = callback;
+    this.eventRegister[eventName][className] = callback;
     if(eventName == "likeInsert") {
       this.insertClasses.push(className);
     }
@@ -216,11 +250,11 @@ proto.a = proto.an = function(name, reactOn, obj) {
 // **dom** Fire the likeInsert events on all elements within a given DOM element.
 proto.domInserted = function(dom) {
   var that = this, signature, fun;
+  // TODO: this could removed
   iterate(this.insertClasses, function(cls) {
     // search for dom element matching those classes
     iterate(byClass(cls, dom), function(el) {
-       signature = cls + "|likeInsert";
-       var fun = that.register[signature];
+       var fun = that.eventRegister["likeInsert"][cls];
        if(fun) {
          fun.call(new Like(el), el, {type:"likeInsert", target:el});
        }
@@ -246,7 +280,7 @@ proto.data = function(key, value) {
   if(typeof value == "undefined") {
     return this.getData(key);
   } else {
-    this.setData(key, value);
+    return this.setData(key, value);
   }
 }
 
@@ -259,6 +293,7 @@ proto.setData = function(key, value, dom) {
     return d.removeAttribute("data-" + key);
   }
   d.setAttribute("data-" + key, "json:"+JSON.stringify(value));
+  return value;
 }
 
 // ** {{{ like.getData(key) }}} **
@@ -273,6 +308,27 @@ proto.getData = function(key, dom) {
   return v;
 }
 
+var idCounter = 1;
+var storage = [];
+proto.id = function() {
+  var id = this.data("like-id");
+  if(!id) {
+    return this.data("like-id", ++idCounter);
+  }
+  return id;
+}
+
+proto.store = function(key, value) {
+  var id = this.id();
+  if(storage[id] == "undefined") {
+    storage[id] = {};
+  }
+  if(typeof value == "undefined") {
+    return storage[id][key];
+  }
+  storage[id][key] = value;
+}
+
 // ** {{{ like.here(dom) }}} **
 //
 // Shortcut to create a new Like object
@@ -280,9 +336,11 @@ proto.here = function(dom) {
   return new Like(dom);
 }
 
+var like = new Like(doc);
+
 // Export the module to the outside world
 if(!global.like) {
-  global.like = new Like(doc);
+  global.like = like;
 }
 
 }(this));

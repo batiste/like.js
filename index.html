@@ -267,17 +267,18 @@ like.a("range-number", "likeInit change keyup", function(dom, event) {
   if(dom.value != v) {
     dom.value = v;
   }
+  this.trigger("quantityChanged", {rain:"like-sum-table"});
 });
 
-like.a("product-line", "likeInit change keyup", function(dom, event) {
+like.a("product-line", "likeInit quantityChanged", function(dom, event) {
   var quantity = this.byClass("like-positive-number")[0].value, price;
   quantity = parseInt(quantity, 10);
   price = parseFloat(this.byClass("price")[0].innerHTML, 10);
   this.byClass("total")[0].innerHTML = roundCent(price * quantity);
 });
 
-like.a("sum-table", "likeInit change keyup", function(dom, event) {
-  var grandTotal = 0; 
+like.a("sum-table", "likeInit quantityChanged", function(dom, event) {
+  var grandTotal = 0;
   this.iterate(this.byClass("total"), function(el) {
     grandTotal += parseFloat(el.innerHTML, 10);
   });
