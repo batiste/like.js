@@ -7,7 +7,7 @@
 // some internal variables
 var hasClass, byId, byTag, byClass, iterate, 
   doc = global.document, proto,
-  // register of callback for every organized this way
+  // register of callback for organized this way
   // {eventName:{className:callbacks}}
   eventRegister = {};
 
@@ -175,27 +175,30 @@ proto.execute = function(event, rainClass) {
   }
 }
 
+// ** {{{ like.rain(dom, event) }}} **
+//
+// Call the callbacks on all the children of the dom
+// that matches the given event.
+
 proto.rain = function(dom, event) {
-  // TODO: must use a global register
-  var evr = eventRegister[event.type], fun;
-  iterate(evr, function(cls) {
+  iterate(eventRegister[event.type], function(fct, cls) {
     if(hasClass(cls, dom)) {
-      evr[cls].call(new Like(dom), dom, event);
+      fct.call(new Like(dom), dom, event);
     }
     iterate(byClass(cls, dom), function(el) {
-      evr[cls].call(new Like(el), el, event);
+      fct.call(new Like(el), el, event);
     });
   });
 };
 
-proto.trigger = function(name, opt) {
+// ** {{{ like.trigger(eventName, options) }}} **
+//
+// Execute the given event from the current dom.
+
+proto.trigger = function(eventName, opt) {
   var d = (opt && opt.dom) || this.scope;
   var evt = {type:name, target:d, preventDefault:function(){}};
   this.execute(evt, (opt && opt.rain));
-}
-
-proto.propagateDown = function(event, down) {
-  
 }
 
 // ** {{{ like.registerEvent(className, eventName, callback) }}} **
@@ -254,24 +257,6 @@ proto.a = proto.an = function(name, reactOn, obj) {
   });
 }
 
-// ** {{{ like.domInserted(dom) }}} **
-// 
-// Add behavior to the event register.
-// 
-// **dom** Fire the likeInsert events on all elements within a given DOM element.
-proto.domInserted = function(dom) {
-  var that = this, signature, fun, evr = eventRegister["likeInsert"];
-  iterate(evr, function(fct, cls) {
-    // search for dom element matching those classes
-    iterate(byClass(cls, dom), function(el) {
-       var fun = evr[cls];
-       if(fun) {
-         fun.call(new Like(el), el, {type:"likeInsert", target:el});
-       }
-    });
-  });
-}
-
 // ** {{{ like.insert(dom, html) }}} **
 // 
 // Insert some HTML into a DOM element
@@ -280,7 +265,7 @@ proto.domInserted = function(dom) {
 // * **html**      HTML string
 proto.insert = function(dom, html) {
   dom.innerHTML = html;
-  this.domInserted(dom);
+  this.rain(dom, {target:dom, type:"likeInsert"});
 }
 
 // ** {{{ like.data(key, [value]) }}} **
