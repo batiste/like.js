@@ -68,11 +68,11 @@ proto.hasClass = hasClass = function (cls, dom) {
   return d.className && d.className.match(m);
 };
 
-// ** {{{ like.byId(Id, dom) }}} **
+// ** {{{ like.byId(Id) }}} **
 //
 // Return a DOM element given it's ID
-proto.byId = byId = function(id, dom){
-  return (dom || this.scope).getElementById(id)};
+proto.byId = byId = function(id) {
+  return doc.getElementById(id)};
 
 // ** {{{ like.byTag(tagName, dom) }}} **
 //
@@ -284,7 +284,7 @@ proto.data = function(key, value) {
 // Save some content into the current dom element.
 proto.setData = function(key, value, dom) {
   var d = this.scope || dom;
-  if(typeof value == "undefined") {
+  if(value === null) {
     return d.removeAttribute("data-" + key);
   }
   d.setAttribute("data-" + key, "json:"+JSON.stringify(value));
@@ -296,6 +296,7 @@ proto.setData = function(key, value, dom) {
 // Return the content stored in the current element.
 proto.getData = function(key, dom) {
   var d = (this.scope || dom);
+  console.log(key, this.scope)
   var v = d.getAttribute("data-" + key);
   if(v && v.indexOf("json:") === 0) {
     return JSON.parse(v.slice(5));
@@ -304,7 +305,7 @@ proto.getData = function(key, dom) {
 }
 
 var idCounter = 1;
-var storage = [];
+var storage = {};
 proto.id = function() {
   var id = this.data("like-id");
   if(!id) {
@@ -315,7 +316,7 @@ proto.id = function() {
 
 proto.store = function(key, value) {
   var id = this.id();
-  if(storage[id] == "undefined") {
+  if(!storage[id]) {
     storage[id] = {};
   }
   if(typeof value == "undefined") {
