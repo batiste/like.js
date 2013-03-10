@@ -144,7 +144,6 @@ proto.removeClass = function(cls, dom) {
 proto.execute = function(event, rainClass) {
   var target = event.target, that=this, complete, fun, ret;
   var evr = eventRegister[event.type];
-  console.log(evr, event.type, "execute");
   if(!evr) {
     return;
   }
@@ -199,7 +198,6 @@ proto.rain = function(dom, event) {
 proto.trigger = function(eventName, opt) {
   var d = (opt && opt.dom) || this.scope;
   var evt = {type:eventName, target:d, preventDefault:function(){}};
-  console.log(opt, d, opt)
   this.execute(evt, (opt && opt.rain));
 }
 
