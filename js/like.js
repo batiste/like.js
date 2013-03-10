@@ -144,6 +144,7 @@ proto.removeClass = function(cls, dom) {
 proto.execute = function(event, rainClass) {
   var target = event.target, that=this, complete, fun, ret;
   var evr = eventRegister[event.type];
+  console.log(evr, event.type, "execute");
   if(!evr) {
     return;
   }
@@ -197,7 +198,8 @@ proto.rain = function(dom, event) {
 
 proto.trigger = function(eventName, opt) {
   var d = (opt && opt.dom) || this.scope;
-  var evt = {type:name, target:d, preventDefault:function(){}};
+  var evt = {type:eventName, target:d, preventDefault:function(){}};
+  console.log(opt, d, opt)
   this.execute(evt, (opt && opt.rain));
 }
 
@@ -268,7 +270,7 @@ proto.insert = function(dom, html) {
   this.rain(dom, {target:dom, type:"likeInsert"});
 }
 
-// ** {{{ like.data(key, [value]) }}} **
+// ** {{{ like.data(key[, value]) }}} **
 // 
 // Set or get the data attribute of the current element
 proto.data = function(key, value) {
@@ -296,7 +298,6 @@ proto.setData = function(key, value, dom) {
 // Return the content stored in the current element.
 proto.getData = function(key, dom) {
   var d = (this.scope || dom);
-  console.log(key, this.scope)
   var v = d.getAttribute("data-" + key);
   if(v && v.indexOf("json:") === 0) {
     return JSON.parse(v.slice(5));
@@ -314,6 +315,9 @@ proto.id = function() {
   return id;
 }
 
+// ** {{{ like.store(key[, value]) }}} **
+// 
+// Associate any kind of data with the curren DOM element
 proto.store = function(key, value) {
   var id = this.id();
   if(!storage[id]) {
