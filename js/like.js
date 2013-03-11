@@ -1,6 +1,6 @@
 // = Like.js source code =
 //
-// Behavior using CSS classes.
+// Batiste Bieler 2013, under BSD licence.
 
 ;(function(global) {
 
