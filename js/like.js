@@ -68,11 +68,11 @@ proto.hasClass = hasClass = function (cls, dom) {
   return d.className && d.className.match(m);
 };
 
-// ** {{{ like.byId(Id, dom) }}} **
+// ** {{{ like.byId(Id) }}} **
 //
 // Return a DOM element given it's ID
-proto.byId = byId = function(id, dom){
-  return (dom || this.scope).getElementById(id)};
+proto.byId = byId = function(id) {
+  return doc.getElementById(id)};
 
 // ** {{{ like.byTag(tagName, dom) }}} **
 //
@@ -197,7 +197,7 @@ proto.rain = function(dom, event) {
 
 proto.trigger = function(eventName, opt) {
   var d = (opt && opt.dom) || this.scope;
-  var evt = {type:name, target:d, preventDefault:function(){}};
+  var evt = {type:eventName, target:d, preventDefault:function(){}};
   this.execute(evt, (opt && opt.rain));
 }
 
@@ -268,7 +268,7 @@ proto.insert = function(dom, html) {
   this.rain(dom, {target:dom, type:"likeInsert"});
 }
 
-// ** {{{ like.data(key, [value]) }}} **
+// ** {{{ like.data(key[, value]) }}} **
 // 
 // Set or get the data attribute of the current element
 proto.data = function(key, value) {
@@ -284,7 +284,7 @@ proto.data = function(key, value) {
 // Save some content into the current dom element.
 proto.setData = function(key, value, dom) {
   var d = this.scope || dom;
-  if(typeof value == "undefined") {
+  if(value === null) {
     return d.removeAttribute("data-" + key);
   }
   d.setAttribute("data-" + key, "json:"+JSON.stringify(value));
@@ -304,7 +304,7 @@ proto.getData = function(key, dom) {
 }
 
 var idCounter = 1;
-var storage = [];
+var storage = {};
 proto.id = function() {
   var id = this.data("like-id");
   if(!id) {
@@ -313,9 +313,12 @@ proto.id = function() {
   return id;
 }
 
+// ** {{{ like.store(key[, value]) }}} **
+// 
+// Associate any kind of data with the curren DOM element
 proto.store = function(key, value) {
   var id = this.id();
-  if(storage[id] == "undefined") {
+  if(!storage[id]) {
     storage[id] = {};
   }
   if(typeof value == "undefined") {

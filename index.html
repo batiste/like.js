@@ -90,7 +90,7 @@ like.a("positive-number", "keyup change likeInit likeInsert", function(dom, even
   if(v < 0 || isNaN(v)) {
     v = 0;
   }
-  if(dom.value!=v) {
+  if(dom.value!=v.toString()) {
     dom.value = v;
   }
 });
@@ -261,7 +261,7 @@ like.a("range-number", "likeInit change keyup", function(dom, event) {
   var range = this.data("range");
   var low = range[0], 
       high = range[1],
-      v = parseInt(dom.value);
+      v = parseInt(dom.value, 10);
   if(v < low) {v = low};
   if(v > high) {v = high};
   if(dom.value != v) {
