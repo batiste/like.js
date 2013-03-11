@@ -10,6 +10,7 @@
 <script src="scripts/prettify.js"></script>
 </head>
 
+
 <body class="intro">
 
 <h1>Like.js - Introduction</h1>
@@ -95,7 +96,7 @@ like.a("positive-number", "keyup change likeInit likeInsert", function(dom, even
   }
 });
 
-like.insert(like.byId("inserted"), 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
+like.insert(like.byId("inserted").scope, 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
   </script>
   <h3>Code</h3>
   <pre class="lang-js prettyprint"></pre>
@@ -271,19 +272,20 @@ like.a("range-number", "likeInit change keyup", function(dom, event) {
 });
 
 like.a("product-line", "likeInit quantityChanged", function(dom, event) {
-  var quantity = this.byClass("like-positive-number")[0].value, price;
+  var quantity = this.byClass("like-positive-number").elements[0].value, price;
   quantity = parseInt(quantity, 10);
-  price = parseFloat(this.byClass("price")[0].innerHTML, 10);
-  this.byClass("total")[0].innerHTML = roundCent(price * quantity);
+  price = parseFloat(this.byClass("price").elements[0].innerHTML, 10);
+  this.byClass("total").elements[0].innerHTML = roundCent(price * quantity);
   this.trigger("totalChanged");
 });
 
 like.a("sum-table", "likeInit totalChanged", function(dom, event) {
   var grandTotal = 0;
-  this.iterate(this.byClass("total"), function(el) {
-    grandTotal += parseFloat(el.innerHTML, 10);
+  this.byClass("total").iterate(function(el) {
+ 
+    grandTotal += parseFloat(el.scope.innerHTML, 10);
   });
-  this.byClass("grand-total")[0].innerHTML = roundCent(grandTotal);
+  this.byClass("grand-total").elements[0].innerHTML = roundCent(grandTotal);
 });
   </script>
   <h3>Code</h3>
@@ -334,12 +336,15 @@ function safe(h) {
   return h.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/^\s+|\s+$/g, '');
 }
 
-like.iterate(like.byClass("snippet"), function(dom) {
-  var code = like.byTag("script", dom)[0].innerHTML;
-  like.byClass("lang-js prettyprint", dom)[0].innerHTML = safe(code);
-  var html = like.byClass("html", dom)[0].innerHTML;
-  like.byClass("lang-html prettyprint", dom)[0].innerHTML = safe(html);
+/*
+like.byClass("snippet").iterate(function(likeObj) {
+  var dom = likeObj.scope;
+  var code = like.byTag("script", dom).el(0).innerHTML;
+  like.byClass("lang-js prettyprint", dom).el(0).innerHTML = safe(code);
+  var html = like.byClass("html", dom).el(0).innerHTML;
+  like.byClass("lang-html prettyprint", dom).el(0).innerHTML = safe(html);
 });
+*/
 
 prettyPrint();
 

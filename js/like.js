@@ -72,22 +72,29 @@ proto.hasClass = hasClass = function (cls, dom) {
 //
 // Return a DOM element given it's ID
 proto.byId = byId = function(id) {
-  return doc.getElementById(id)};
+  return new Like(doc.getElementById(id));}
 
 // ** {{{ like.byTag(tagName, dom) }}} **
 //
 // Return a list of DOM element given a tag name.
-proto.byTag = byTag = function(tag, dom){return (
-  dom || this.scope).getElementsByTagName(tag)};
+proto.byTag = byTag = function(tag, dom) {
+  console.log(tag, dom, this.scope)
+  return this.wrapper(
+    (dom || 
+      this.scope).getElementsByTagName(tag));
+};
 
 // ** {{{ like.byClass(className, dom) }}} **
 //
 // Return a list of DOM element given a class name.
 proto.byClass = byClass = function(cls, dom) {
   var d = dom || this.scope;
+  console.log("huu", d, this)
   // apparently faster
-  if(d.getElementsByClassName) {return d.getElementsByClassName(cls)};
-  if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
+  if(d.getElementsByClassName) {
+    return this.wrapper(d.getElementsByClassName(cls))};
+  if(d.querySelectorAll) {
+    return this.wrapper(d.querySelectorAll("."+cls))};
   // < IE8
   var accu = [];
   iterate(byTag("*", d), function(el) {
@@ -95,7 +102,7 @@ proto.byClass = byClass = function(cls, dom) {
       accu.push(el);
     }
   });
-  return accu;
+  return this.wrapper(accu);
 };
 
 // ** {{{ like.listenTo(event, listener, dom) }}} **
@@ -317,6 +324,7 @@ proto.id = function() {
 // 
 // Associate any kind of data with the curren DOM element
 proto.store = function(key, value) {
+  console.log(this, key, value)
   var id = this.id();
   if(!storage[id]) {
     storage[id] = {};
@@ -333,6 +341,35 @@ proto.store = function(key, value) {
 proto.here = function(dom) {
   return new Like(dom);
 }
+
+function Wrapper(likeObj, els) {
+  this.parent = likeObj;
+  this.scope = likeObj.scope;
+  this.elements = els;
+}
+
+iterate(proto, function(fct, key) {
+  if(typeof fct == "function") {
+    Wrapper.prototype[key] = function wrapElements() {
+      var that = this, result;
+      var args = arguments;
+      iterate(that.elements, function execOne(el) {
+        var h = new Like(el);
+        result = fct.apply(h, args);
+      });
+      return result;
+    }
+  }
+});
+
+Wrapper.prototype.el = function(i) {
+  return this.elements[i];
+}
+
+proto.wrapper = function(els) {
+  return new Wrapper(this, els);
+};
+
 
 var like = new Like(doc);
 

@@ -9,7 +9,7 @@ test("data", function() {
 
     ok(like.byId("test-data"), "Dom present")
 
-    var span = like.here(like.byId("test-data"));
+    var span = like.byId("test-data");
     equal(span.data("test1"), 'lorem ipsum', "get normal value");
     equal(span.data("wrong"), undefined, "wrong data return undefined");
 
@@ -64,10 +64,7 @@ test("trigger", function() {
     var d = document.createElement("div");
     d.innerHTML = "<span class='like-local like-global'></span>";
     document.body.appendChild(d);
-    var span = like.here(like.here(d).byTag("span")[0]);
-
-    notEqual(span.scope, document);
-    notEqual(span.scope, undefined);
+    var span = like.here(d).byTag("span");
     
     var local, global;
     like.a("local", "local", function(dom, event){
@@ -89,4 +86,23 @@ test("trigger", function() {
 
 
 });
+
+
+
+test("wrapper", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span id='t1' class='test'></span><span id='t2' class='test'></span>";
+    document.body.appendChild(d);
+
+    var div = like.here(d);
+    var wrapper = div.byClass("test");
+  
+    wrapper.store("hello", "world");
+
+    equal(like.byId("t1").store("hello"), "world");
+    equal(like.byId("t2").store("hello"), "world");
+
+});
+
 
