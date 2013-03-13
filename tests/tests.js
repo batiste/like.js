@@ -88,7 +88,6 @@ test("trigger", function() {
 });
 
 
-
 test("wrapper", function() {
 
     var d = document.createElement("div");
@@ -103,6 +102,24 @@ test("wrapper", function() {
     equal(like.byId("t1").store("hello"), "world");
     equal(like.byId("t2").store("hello"), "world");
 
+});
+
+test("insert", function() {
+
+    var d = document.createElement("div");
+    document.body.appendChild(d);
+    d = like.here(d);
+
+    var insertedCalled = false;
+    like.an("inserted", "likeInsert", function() {
+      insertedCalled = true;
+    });
+
+    d.html("<span id='t1' class='like-inserted'></span>");
+    
+    equal(true, insertedCalled);
+
+    
 });
 
 

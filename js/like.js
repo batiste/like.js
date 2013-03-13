@@ -93,12 +93,14 @@ proto.byClass = byClass = function(cls, dom) {
   var d = dom || this.scope;
   // apparently faster
   if(d.getElementsByClassName) {
-    return this.wrapper(d.getElementsByClassName(cls))};
+    return this.wrapper(d.getElementsByClassName(cls))
+  };
   if(d.querySelectorAll) {
-    return this.wrapper(d.querySelectorAll("."+cls))};
+    return this.wrapper(d.querySelectorAll("."+cls))
+  };
   // < IE8
   var accu = [];
-  iterate(byTag("*", d), function(el) {
+  iterate(this.byTag("*", d), function(el) {
     if(hasClass(cls, el)) {
       accu.push(el);
     }
@@ -157,7 +159,7 @@ proto.execute = function(event, rainClass) {
   }
   while(target) {
     if(rainClass && hasClass(rainClass, target)) {
-      this.rain(target, event);
+      this.here(target).rain(event);
       return;
     }
     if(!target.className || target.className.indexOf("like-") == -1) {
@@ -183,18 +185,19 @@ proto.execute = function(event, rainClass) {
   }
 }
 
-// ** {{{ like.rain(dom, event) }}} **
+// ** {{{ like.rain(event) }}} **
 //
-// Call the callbacks on all the children of the dom
-// that matches the given event.
+// Call the callbacks on all the children 
+// in the current scope that matches the given event.
 
-proto.rain = function(event, dom) {
-  var d = dom || this.scope;
+proto.rain = function(event) {
+  var d = this.scope;
+  d = this.here(d);
   iterate(eventRegister[event.type], function(fct, cls) {
     if(hasClass(cls, d)) {
       fct.call(new Like(d), d, event);
     }
-    iterate(byClass(cls, d).elements, function(el) {
+    d.byClass(cls).iterate(function(el) {
       fct.call(new Like(el), el, event);
     });
   });
@@ -277,7 +280,7 @@ proto.html = function(html) {
     return d.innerHTML;
   }
   d.innerHTML = html;
-  this.rain(d, {target:d, type:"likeInsert"});
+  this.rain({target:d, type:"likeInsert"});
 }
 
 // ** {{{ like.data(key[, value]) }}} **
