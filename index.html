@@ -96,7 +96,7 @@ like.a("positive-number", "keyup change likeInit likeInsert", function(dom, even
   }
 });
 
-like.insert(like.byId("inserted").scope, 'Same but inserted dynamically <input class="like-positive-number" value="-100" />');
+like.byId("inserted").html('Same but inserted dynamically <input class="like-positive-number" value="-100" />');
   </script>
   <h3>Code</h3>
   <pre class="lang-js prettyprint"></pre>
@@ -281,9 +281,9 @@ like.a("product-line", "likeInit quantityChanged", function(dom, event) {
 
 like.a("sum-table", "likeInit totalChanged", function(dom, event) {
   var grandTotal = 0;
-  this.byClass("total").iterate(function(el) {
- 
-    grandTotal += parseFloat(el.scope.innerHTML, 10);
+  like.iterate(this.byClass("total"), function(el) {
+    console.log(el)
+    grandTotal += parseFloat(el.innerHTML, 10);
   });
   this.byClass("grand-total").elements[0].innerHTML = roundCent(grandTotal);
 });
@@ -336,15 +336,14 @@ function safe(h) {
   return h.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/^\s+|\s+$/g, '');
 }
 
-/*
-like.byClass("snippet").iterate(function(likeObj) {
-  var dom = likeObj.scope;
-  var code = like.byTag("script", dom).el(0).innerHTML;
-  like.byClass("lang-js prettyprint", dom).el(0).innerHTML = safe(code);
-  var html = like.byClass("html", dom).el(0).innerHTML;
-  like.byClass("lang-html prettyprint", dom).el(0).innerHTML = safe(html);
+like.iterate(like.byClass("snippet").elements, function(el) {
+  var l = like.here(el);
+  var code = l.byTag("script").html();
+  l.byClass("lang-js prettyprint").html(safe(code));
+  var html = l.byClass("html").html();
+  l.byClass("lang-html prettyprint").html(safe(code));
 });
-*/
+
 
 prettyPrint();
 

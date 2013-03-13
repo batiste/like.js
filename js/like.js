@@ -34,6 +34,7 @@ proto.toString = function(){return "Like("+this.scope.toString()+")"};
 // Iterate over an Array or an Object, calling a callback for each item.
 // Returning false interrupt the iteration.
 proto.iterate = iterate = function (obj, fct) {
+  console.log(obj, fct)
   var i;
   if(!obj) {
     return false;
@@ -78,7 +79,6 @@ proto.byId = byId = function(id) {
 //
 // Return a list of DOM element given a tag name.
 proto.byTag = byTag = function(tag, dom) {
-  console.log(tag, dom, this.scope)
   return this.wrapper(
     (dom || 
       this.scope).getElementsByTagName(tag));
@@ -89,7 +89,6 @@ proto.byTag = byTag = function(tag, dom) {
 // Return a list of DOM element given a class name.
 proto.byClass = byClass = function(cls, dom) {
   var d = dom || this.scope;
-  console.log("huu", d, this)
   // apparently faster
   if(d.getElementsByClassName) {
     return this.wrapper(d.getElementsByClassName(cls))};
@@ -187,12 +186,13 @@ proto.execute = function(event, rainClass) {
 // Call the callbacks on all the children of the dom
 // that matches the given event.
 
-proto.rain = function(dom, event) {
+proto.rain = function(event, dom) {
+  var d = dom || this.scope;
   iterate(eventRegister[event.type], function(fct, cls) {
-    if(hasClass(cls, dom)) {
-      fct.call(new Like(dom), dom, event);
+    if(hasClass(cls, d)) {
+      fct.call(new Like(d), d, event);
     }
-    iterate(byClass(cls, dom), function(el) {
+    iterate(byClass(cls, d).elements, function(el) {
       fct.call(new Like(el), el, event);
     });
   });
@@ -230,7 +230,7 @@ proto.registerEvent = function(className, eventName, callback) {
     this.listenTo(eventName, listener);
     evr[className] = callback;
     if(eventName == "likeInit") {
-      iterate(that.byClass(className), function(el) {
+      iterate(that.byClass(className).elements, function(el) {
         callback.call(new Like(el), el, {type:"likeInit", target:el});
       });
     }
@@ -264,15 +264,18 @@ proto.a = proto.an = function(name, reactOn, obj) {
   });
 }
 
-// ** {{{ like.insert(dom, html) }}} **
+// ** {{{ like.insert(html) }}} **
 // 
 // Insert some HTML into a DOM element
 // 
-// * **dom**       The targeted DOM element
 // * **html**      HTML string
-proto.insert = function(dom, html) {
-  dom.innerHTML = html;
-  this.rain(dom, {target:dom, type:"likeInsert"});
+proto.html = function(html) {
+  var d = this.scope;
+  if(html === undefined) {
+    return d.innerHTML;
+  }
+  d.innerHTML = html;
+  this.rain(d, {target:d, type:"likeInsert"});
 }
 
 // ** {{{ like.data(key[, value]) }}} **
@@ -302,7 +305,7 @@ proto.setData = function(key, value, dom) {
 // 
 // Return the content stored in the current element.
 proto.getData = function(key, dom) {
-  var d = (this.scope || dom);
+  var d = this.scope || dom;
   var v = d.getAttribute("data-" + key);
   if(v && v.indexOf("json:") === 0) {
     return JSON.parse(v.slice(5));
@@ -324,7 +327,6 @@ proto.id = function() {
 // 
 // Associate any kind of data with the curren DOM element
 proto.store = function(key, value) {
-  console.log(this, key, value)
   var id = this.id();
   if(!storage[id]) {
     storage[id] = {};
