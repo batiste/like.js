@@ -34,10 +34,12 @@ proto.toString = function(){return "Like("+this.scope.toString()+")"};
 // Iterate over an Array or an Object, calling a callback for each item.
 // Returning false interrupt the iteration.
 proto.iterate = iterate = function (obj, fct) {
-  console.log(obj, fct)
   var i;
   if(!obj) {
     return false;
+  }
+  if(obj.hasOwnProperty("elements")) {
+    obj = obj.elements;
   }
   if(obj.hasOwnProperty("length")) {
     for(i=0; i<obj.length; i++) {
@@ -364,8 +366,18 @@ iterate(proto, function(fct, key) {
   }
 });
 
+// methods with different implementation
+
+proto.el = function() {
+  return this.scope;
+}
+
 Wrapper.prototype.el = function(i) {
   return this.elements[i];
+}
+
+Wrapper.prototype.iterate = function(fct) {
+  return iterate(this.elements, fct);
 }
 
 proto.wrapper = function(els) {

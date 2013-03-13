@@ -272,20 +272,19 @@ like.a("range-number", "likeInit change keyup", function(dom, event) {
 });
 
 like.a("product-line", "likeInit quantityChanged", function(dom, event) {
-  var quantity = this.byClass("like-positive-number").elements[0].value, price;
+  var quantity = this.byClass("like-positive-number").el(0).value, price;
   quantity = parseInt(quantity, 10);
-  price = parseFloat(this.byClass("price").elements[0].innerHTML, 10);
-  this.byClass("total").elements[0].innerHTML = roundCent(price * quantity);
+  price = parseFloat(this.byClass("price").html(), 10);
+  this.byClass("total").html(roundCent(price * quantity));
   this.trigger("totalChanged");
 });
 
 like.a("sum-table", "likeInit totalChanged", function(dom, event) {
   var grandTotal = 0;
-  like.iterate(this.byClass("total"), function(el) {
-    console.log(el)
+  this.byClass("total").iterate(function(el) {
     grandTotal += parseFloat(el.innerHTML, 10);
   });
-  this.byClass("grand-total").elements[0].innerHTML = roundCent(grandTotal);
+  this.byClass("grand-total").html(roundCent(grandTotal));
 });
   </script>
   <h3>Code</h3>
@@ -336,12 +335,12 @@ function safe(h) {
   return h.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/^\s+|\s+$/g, '');
 }
 
-like.iterate(like.byClass("snippet").elements, function(el) {
+like.iterate(like.byClass("snippet"), function(el) {
   var l = like.here(el);
   var code = l.byTag("script").html();
   l.byClass("lang-js prettyprint").html(safe(code));
   var html = l.byClass("html").html();
-  l.byClass("lang-html prettyprint").html(safe(code));
+  l.byClass("lang-html prettyprint").html(safe(html));
 });
 
 
