@@ -187,7 +187,7 @@ proto.execute = function(event, rainClass) {
 
 // ** {{{ like.rain(event) }}} **
 //
-// Call the callbacks on all the children 
+// Trigger the behavior on all the children 
 // in the current scope that matches the given event.
 
 proto.rain = function(event) {

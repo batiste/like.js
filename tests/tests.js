@@ -118,8 +118,22 @@ test("insert", function() {
     d.html("<span id='t1' class='like-inserted'></span>");
     
     equal(true, insertedCalled);
-
-    
+ 
 });
 
+
+test("byClass chaining", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span class='test1'><span class='test3'></span></span><span class='test2'></span>";
+    document.body.appendChild(d);
+
+    var div = like.here(d);
+
+    equal(div.byClass("test1").byClass("test3").el(0).className, "test3");
+    equal(div.byClass("test2").byClass("test3").el(0), undefined);
+    equal(div.byClass("test3").byClass("test1").el(0), undefined);
+    equal(div.byClass("test2").el(0).className, "test2");
+
+});
 
