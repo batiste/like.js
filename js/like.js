@@ -27,6 +27,11 @@ function Like(scope) {
 // a shortcut for the prototype
 proto = Like.prototype;
 
+proto.reset = function() {
+  eventRegister = {};
+  this.register = eventRegister;
+}
+
 proto.toString = function(){return "Like("+this.scope.toString()+")"};
 
 // ** {{{ like.iterate(object, callback) }}} **

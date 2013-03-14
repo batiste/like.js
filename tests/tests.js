@@ -22,6 +22,7 @@ test("data", function() {
     span.data("test1", {a:2, b:1});
     equal(span.data("test1").a, 2, "set JSON");
 
+    like.reset();
     like.here(d).remove();
 
 });
@@ -37,6 +38,7 @@ test("id", function() {
   notEqual(div.id(), undefined, "has an id");
   equal(div.id(), id, "id stay constant");
 
+  like.reset();
   div.remove();
 
 });
@@ -55,6 +57,7 @@ test("store", function() {
     div.store("test2", function(){return 2;});
     equal(div.store("test2")(), 2, "get function");
 
+    like.reset();
     div.remove();
 
 });
@@ -83,10 +86,9 @@ test("trigger", function() {
       ok(local, "Custom local event should be called");
       ok(local, "Custom global event should be called");
       like.here(d).remove();
+      like.reset();
       start();
     }, 20);
-
-
 
 });
 
@@ -106,6 +108,7 @@ test("wrapper", function() {
     equal(like.byId("t2").store("hello"), "world");
 
     div.remove();
+    like.reset();
 
 });
 
@@ -125,6 +128,7 @@ test("insert", function() {
     equal(true, insertedCalled);
 
     d.remove();
+    like.reset();
  
 });
 
@@ -142,6 +146,7 @@ test("byClass chaining", function() {
     equal(div.byClass("test2").el(0).className, "test2");
 
     div.remove();
+    like.reset();
 
 });
 
@@ -165,6 +170,7 @@ test("rain", function() {
     equal(aCalled, true);
 
     div.remove();
+    like.reset();
 
 });
 
@@ -188,5 +194,17 @@ test("rain2", function() {
     equal(bCalled, false);
 
     like.here(d).remove();
+    like.reset();
+
+});
+
+test("reset", function() {
+
+    var called = false;
+    like.a("a", "click", function(){called=true});
+    equal(typeof like.register.click["like-a"], "function");
+    like.reset();
+    equal(like.register["click"], undefined);
+
 
 });
