@@ -283,6 +283,15 @@ proto.html = function(html) {
   this.rain({target:d, type:"likeInsert"});
 }
 
+// ** {{{ like.remove() }}} **
+//
+// Remove the dom element.
+proto.remove = function() {
+  var d = this.scope;
+  d.parentNode.removeChild(d);
+}
+
+
 // ** {{{ like.data(key[, value]) }}} **
 // 
 // Set or get the data attribute of the current element
