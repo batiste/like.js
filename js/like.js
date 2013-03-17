@@ -73,7 +73,10 @@ proto.iterate = iterate = function (obj, fct) {
 proto.hasClass = hasClass = function (cls, dom) {
   var d = (dom || this.scope);
   var m = new RegExp("\\b" + cls + "\\b");
-  return d.className && d.className.match(m);
+  if(!d.className){ 
+    return false;
+  }
+  return d.className.match(m) !== undefined;
 };
 
 // ** {{{ like.byId(Id) }}} **
@@ -135,7 +138,7 @@ proto.listenTo = function (event, listener, dom) {
 proto.addClass = function(cls, dom) {
   var d = dom || this.scope;
   if(!hasClass(cls, d)) {
-    d.className = d.className + " " + cls;
+    d.className = (d.className ? d.className + " " : "") + cls;
   }
 }
 
@@ -144,6 +147,9 @@ proto.addClass = function(cls, dom) {
 // Remove a class on a given dom element.
 proto.removeClass = function(cls, dom) {
   var d = dom || this.scope;
+  if(!d.className) {
+    return;
+  }
   var m = new RegExp("\\b" + cls + "\\b");
   d.className = d.className.replace(m, "");
 }

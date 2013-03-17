@@ -206,5 +206,44 @@ test("reset", function() {
     like.reset();
     equal(like.register["click"], undefined);
 
+});
+
+test("hasClass", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span id='t2' class=' hasClass1\r\nhasClass2\r\nhasClass-3 '>";
+    document.body.appendChild(d);
+
+    var el = like.here(like.here(d).byId("t2").el(0));
+
+    ok(el.hasClass("hasClass1"));
+    ok(el.hasClass("hasClass2"));
+    ok(el.hasClass("hasClass-3"));
+
+    like.here(d).remove();
+    like.reset();
+
+});
+
+test("addClass / removeClass", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span id='t23'>";
+    document.body.appendChild(d);
+
+    var el = like.here(like.here(d).byId("t3").el(0));
+
+    equal(el.scope.className, undefined);
+    equal(el.hasClass("hasClass1"), false);
+    el.removeClass("hasClass1");
+    equal(el.scope.className, undefined);
+    el.addClass("hasClass1");
+    equal(el.hasClass("hasClass1"), true);
+    el.removeClass("hasClass1");
+    equal(el.hasClass("hasClass1"), false);
+    equal(el.scope.className, "");
+
+    like.here(d).remove();
+    like.reset();
 
 });
