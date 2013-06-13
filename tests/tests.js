@@ -112,7 +112,7 @@ test("wrapper", function() {
 
 });
 
-test("insert", function() {
+test("html", function() {
 
     var d = document.createElement("div");
     document.body.appendChild(d);

@@ -291,12 +291,13 @@ proto.a = proto.an = function(name, reactOn, obj) {
   return this;
 }
 
-// ** {{{ like.insert(html) }}} **
+// ** {{{ like.html(html) }}} **
 // 
-// Insert some HTML into a DOM element
+// Insert some HTML into a DOM element. If no HTML is provided,
+// the method returns the content of the DOM.
 // 
 // * **html**      HTML string
-proto.html = function(html) {
+proto.html = proto.html = function(html) {
   var d = this.scope;
   if(html === undefined) {
     return d.innerHTML;
@@ -387,7 +388,8 @@ proto.here = function(dom) {
 
 // ** {{{ Collection }}} **
 //
-// A collection of Like object that has a similar API as a Like object
+// Create a collection of Like object from a list
+// of DOM elements with a similar API that a single Like object.
 function Collection(likeObj, els) {
   this.parent = likeObj;
   this.scope = likeObj.scope;

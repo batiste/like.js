@@ -111,7 +111,7 @@ like.byId("inserted").html('Same but inserted dynamically <input class="like-pos
     input doesn't have the <strong>wrong</strong> value.</li>
   <li>
  <strong>likeInsert</strong> on the other hand is triggered when new behavioral DOM elements
-     are inserted in the document using <strong>like.insert(dom, html)</strong>.
+     are inserted in the document using <strong>like.html(dom, html)</strong>.
   </li>
   </ul>
 
@@ -300,6 +300,9 @@ like.a("sum-table", "likeInit totalChanged", function(dom, event) {
   <ol>
   <li>
     If you prefix a data atribute with <em>json:</em> like.data will parse the JSON and return it automatically. 
+  </li>
+  <li>
+    The <em>trigger</em> method will create an event on the fly that will bubble up the DOM tree.
   </li>
   </ol>
 
