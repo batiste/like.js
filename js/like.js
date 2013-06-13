@@ -236,7 +236,7 @@ proto.trigger = function(eventName, opt) {
 // ** {{{ like.registerEvent(className, eventName, callback) }}} **
 //
 // Add a (className, eventName) couple to the event registry. 
-// Execute likeInit events and register the className in the insert table if likeInsert is present.
+// If the event is a likeInit, the event is immediatly executed.
 //
 // * **className**  Class name upon to fire the event
 // * **eventName**  The event name
