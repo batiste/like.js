@@ -211,7 +211,7 @@ test("reset", function() {
 test("hasClass", function() {
 
     var d = document.createElement("div");
-    d.innerHTML = "<span id='t2' class=' hasClass1\r\nhasClass2\r\nhasClass-3 '>";
+    d.innerHTML = "<span id='t2' class=' hasClass1\r\nhasClass2\r\nhasClass-3 ' />";
     document.body.appendChild(d);
 
     var el = like.here(like.here(d).byId("t2").el(0));
@@ -219,6 +219,27 @@ test("hasClass", function() {
     ok(el.hasClass("hasClass1"));
     ok(el.hasClass("hasClass2"));
     ok(el.hasClass("hasClass-3"));
+
+    like.here(d).remove();
+    like.reset();
+
+});
+
+test("hasClass bug", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span id='t2' class='like-bubble' />";
+    document.body.appendChild(d);
+
+    var el = like.here(like.here(d).byId("t2").el(0));
+
+    ok(el.hasClass("like-bubble"));
+    ok(!el.hasClass("bubble-over"));
+
+    el.addClass("bubble-over");
+
+    ok(el.hasClass("like-bubble"));
+    ok(el.hasClass("bubble-over"));
 
     like.here(d).remove();
     like.reset();

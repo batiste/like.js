@@ -76,7 +76,7 @@ proto.hasClass = hasClass = function (cls, dom) {
   if(!d.className){ 
     return false;
   }
-  return d.className.match(m) !== undefined;
+  return d.className.match(m) !== null;
 };
 
 // ** {{{ like.byId(Id) }}} **
