@@ -1,12 +1,15 @@
 // = Like.js source code =
 //
-// Behavior using CSS classes.
+// Batiste Bieler 2013, under BSD licence.
 
 ;(function(global) {
 
 // some internal variables
 var hasClass, byId, byTag, byClass, iterate, 
-  doc = global.document, proto;
+  doc = global.document, proto,
+  // register of callback for organized this way
+  // {eventName:{className:callbacks}}
+  eventRegister = {};
 
 // ** {{{ Like constructor }}} **
 //
@@ -15,28 +18,49 @@ var hasClass, byId, byTag, byClass, iterate,
 // the dom parameter is left unspecified.
 // by default the scope is the document.
 function Like(scope) {
-  // register of callback for every (class|event) couple
-  this.register = {};
   // classes that have the likeInsert event
-  this.insertClasses = [];
   this.scope = scope || doc;
+  // shared global
+  this.register = eventRegister;
 }
 
 // a shortcut for the prototype
 proto = Like.prototype;
 
+proto.reset = function() {
+  eventRegister = {};
+  this.register = eventRegister;
+}
+
 proto.toString = function(){return "Like("+this.scope.toString()+")"};
 
 // ** {{{ like.iterate(object, callback) }}} **
 //
-// Iterate over an Array, calling a callback for each item.
+// Iterate over an Array or an Object, calling a callback for each item.
 // Returning false interrupt the iteration.
 proto.iterate = iterate = function (obj, fct) {
   var i;
-  for(i=0; i<obj.length; i++) {
-    if(fct(obj[i]) === false) {
-      // end of the iteration
-      return false;
+  if(!obj) {
+    return false;
+  }
+  if(obj.hasOwnProperty("elements")) {
+    obj = obj.elements;
+  }
+  if(obj.hasOwnProperty("length")) {
+    for(i=0; i<obj.length; i++) {
+      if(fct(obj[i], i) === false) {
+        // end of the iteration
+        return false;
+      }    
+    }
+  } else {
+    for(i in obj) {
+      if(obj.hasOwnProperty(i)) {
+        if(fct(obj[i], i) === false) {
+          // end of the iteration
+          return false;
+        }
+      }
     }
   }
   // sucessful full iteration
@@ -49,20 +73,26 @@ proto.iterate = iterate = function (obj, fct) {
 proto.hasClass = hasClass = function (cls, dom) {
   var d = (dom || this.scope);
   var m = new RegExp("\\b" + cls + "\\b");
-  return d.className && d.className.match(m);
+  if(!d.className){ 
+    return false;
+  }
+  return d.className.match(m) !== null;
 };
 
-// ** {{{ like.byId(Id, dom) }}} **
+// ** {{{ like.byId(Id) }}} **
 //
 // Return a DOM element given it's ID
-proto.byId = byId = function(id, dom){
-  return (dom || this.scope).getElementById(id)};
+proto.byId = byId = function(id) {
+  return new Like(doc.getElementById(id));}
 
 // ** {{{ like.byTag(tagName, dom) }}} **
 //
 // Return a list of DOM element given a tag name.
-proto.byTag = byTag = function(tag, dom){return (
-  dom || this.scope).getElementsByTagName(tag)};
+proto.byTag = byTag = function(tag, dom) {
+  return this.wrapper(
+    (dom || 
+      this.scope).getElementsByTagName(tag));
+};
 
 // ** {{{ like.byClass(className, dom) }}} **
 //
@@ -70,16 +100,20 @@ proto.byTag = byTag = function(tag, dom){return (
 proto.byClass = byClass = function(cls, dom) {
   var d = dom || this.scope;
   // apparently faster
-  if(d.getElementsByClassName) {return d.getElementsByClassName(cls)};
-  if(d.querySelectorAll) {return d.querySelectorAll("."+cls)};
+  if(d.getElementsByClassName) {
+    return this.wrapper(d.getElementsByClassName(cls))
+  };
+  if(d.querySelectorAll) {
+    return this.wrapper(d.querySelectorAll("."+cls))
+  };
   // < IE8
   var accu = [];
-  iterate(byTag("*", d), function(el) {
+  iterate(this.byTag("*", d), function(el) {
     if(hasClass(cls, el)) {
       accu.push(el);
     }
   });
-  return accu;
+  return this.wrapper(accu);
 };
 
 // ** {{{ like.listenTo(event, listener, dom) }}} **
@@ -96,6 +130,7 @@ proto.listenTo = function (event, listener, dom) {
       return listener(e);
     });
   }
+  return this;
 };
 
 // ** {{{ like.addClass(className, dom) }}} **
@@ -104,8 +139,9 @@ proto.listenTo = function (event, listener, dom) {
 proto.addClass = function(cls, dom) {
   var d = dom || this.scope;
   if(!hasClass(cls, d)) {
-    d.className = d.className + " " + cls;
+    d.className = (d.className ? d.className + " " : "") + cls;
   }
+  return this;
 }
 
 // ** {{{ like.removeClass(className, dom) }}} **
@@ -113,8 +149,12 @@ proto.addClass = function(cls, dom) {
 // Remove a class on a given dom element.
 proto.removeClass = function(cls, dom) {
   var d = dom || this.scope;
+  if(!d.className) {
+    return;
+  }
   var m = new RegExp("\\b" + cls + "\\b");
   d.className = d.className.replace(m, "");
+  return this;
 }
 
 // ** {{{ like.execute(event) }}} **
@@ -125,18 +165,25 @@ proto.removeClass = function(cls, dom) {
 // there is a match the event is executed.
 //
 // **event** The event to execute
-proto.execute = function(event) {
-  var target = event.target, signature, that=this, complete, fun, ret;
+proto.execute = function(event, rainClass) {
+  var target = event.target, that=this, complete, fun, ret;
+  var evr = eventRegister[event.type];
+  if(!evr) {
+    return;
+  }
   while(target) {
+    if(rainClass && hasClass(rainClass, target)) {
+      this.here(target).rain(event);
+      return;
+    }
     if(!target.className || target.className.indexOf("like-") == -1) {
       target = target.parentNode;
       continue;
     }
     complete = iterate(target.className.split(" "), function(cls) {
       if(cls.indexOf("like-") == 0) {
-        signature = cls + "|" + event.type;
-        if(that.register[signature]) {
-           fun = that.register[signature];
+        if(evr[cls]) {
+           fun = evr[cls];
            ret = fun.call(new Like(target), target, event);
            if(ret === false) {
               event.preventDefault();
@@ -150,6 +197,37 @@ proto.execute = function(event) {
     }
     target = target.parentNode;
   }
+  return this;
+}
+
+// ** {{{ like.rain(event) }}} **
+//
+// Trigger the behavior on all the children 
+// in the current scope that matches the given event.
+
+proto.rain = function(event) {
+  var d = this.scope;
+  d = this.here(d);
+  iterate(eventRegister[event.type], function(fct, cls) {
+    if(hasClass(cls, d)) {
+      fct.call(new Like(d), d, event);
+    }
+    d.byClass(cls).iterate(function(el) {
+      fct.call(new Like(el), el, event);
+    });
+  });
+  return this;
+};
+
+// ** {{{ like.trigger(eventName, options) }}} **
+//
+// Execute the given event from the current dom.
+
+proto.trigger = function(eventName, opt) {
+  var d = (opt && opt.dom) || this.scope;
+  var evt = {type:eventName, target:d, preventDefault:function(){}};
+  this.execute(evt, (opt && opt.rain));
+  return this;
 }
 
 // ** {{{ like.registerEvent(className, eventName, callback) }}} **
@@ -162,22 +240,24 @@ proto.execute = function(event) {
 // * **callback**   Callback defined by the user
 proto.registerEvent = function(className, eventName, callback) {
   var signature = className + "|" + eventName, that=this;
-  // only one event by signature is allowed
-  if(!this.register[signature]) {
+  var evr = eventRegister[eventName];
+  if(!evr) {
+    evr = eventRegister[eventName] = {};
+  }
+  // only one class by type of event
+  if(!evr[className]) {
     function listener(e) {
       return that.execute(e);
     }
     this.listenTo(eventName, listener);
-    this.register[signature] = callback;
-    if(eventName == "likeInsert") {
-      this.insertClasses.push(className);
-    }
+    evr[className] = callback;
     if(eventName == "likeInit") {
-      iterate(that.byClass(className), function(el) {
+      iterate(that.byClass(className).elements, function(el) {
         callback.call(new Like(el), el, {type:"likeInit", target:el});
       });
     }
   }
+  return this;
 }
 
 // ** {{{ like.a(name, reactOn, obj) }}} **
@@ -191,11 +271,9 @@ proto.registerEvent = function(className, eventName, callback) {
 proto.a = proto.an = function(name, reactOn, obj) {
   var that=this, key;
   if(typeof reactOn == "object") {
-    for(key in reactOn) {
-      if(reactOn.hasOwnProperty(key)) {
-        that.registerEvent("like-"+name, key, reactOn[key]);
-      }
-    }
+    iterate(reactOn, function(fct, evt) {
+        that.registerEvent("like-"+name, evt, fct);
+    });
     return;
   }
   iterate(reactOn.split(/[\s]+/), function(evt) {
@@ -207,46 +285,42 @@ proto.a = proto.an = function(name, reactOn, obj) {
       that.registerEvent("like-"+name, evt, obj);
     }
   });
+  return this;
 }
 
-// ** {{{ like.domInserted(dom) }}} **
-// 
-// Add behavior to the event register.
-// 
-// **dom** Fire the likeInsert events on all elements within a given DOM element.
-proto.domInserted = function(dom) {
-  var that = this, signature, fun;
-  iterate(this.insertClasses, function(cls) {
-    // search for dom element matching those classes
-    iterate(byClass(cls, dom), function(el) {
-       signature = cls + "|likeInsert";
-       var fun = that.register[signature];
-       if(fun) {
-         fun.call(new Like(el), el, {type:"likeInsert", target:el});
-       }
-    });
-  });
-}
-
-// ** {{{ like.insert(dom, html) }}} **
+// ** {{{ like.insert(html) }}} **
 // 
 // Insert some HTML into a DOM element
 // 
-// * **dom**       The targeted DOM element
 // * **html**      HTML string
-proto.insert = function(dom, html) {
-  dom.innerHTML = html;
-  this.domInserted(dom);
+proto.html = function(html) {
+  var d = this.scope;
+  if(html === undefined) {
+    return d.innerHTML;
+  }
+  d.innerHTML = html;
+  this.rain({target:d, type:"likeInsert"});
+  return this;
 }
 
-// ** {{{ like.data(key, [value]) }}} **
+// ** {{{ like.remove() }}} **
+//
+// Remove the dom element.
+proto.remove = function() {
+  var d = this.scope;
+  d.parentNode.removeChild(d);
+  return this;
+}
+
+
+// ** {{{ like.data(key[, value]) }}} **
 // 
 // Set or get the data attribute of the current element
 proto.data = function(key, value) {
   if(typeof value == "undefined") {
     return this.getData(key);
   } else {
-    this.setData(key, value);
+    return this.setData(key, value);
   }
 }
 
@@ -255,22 +329,49 @@ proto.data = function(key, value) {
 // Save some content into the current dom element.
 proto.setData = function(key, value, dom) {
   var d = this.scope || dom;
-  if(typeof value == "undefined") {
+  if(value === null) {
     return d.removeAttribute("data-" + key);
   }
   d.setAttribute("data-" + key, "json:"+JSON.stringify(value));
+  return this;
 }
 
 // ** {{{ like.getData(key) }}} **
 // 
 // Return the content stored in the current element.
 proto.getData = function(key, dom) {
-  var d = (this.scope || dom);
+  var d = this.scope || dom;
   var v = d.getAttribute("data-" + key);
   if(v && v.indexOf("json:") === 0) {
     return JSON.parse(v.slice(5));
   }
   return v;
+}
+
+var idCounter = 1;
+var storage = {};
+proto.id = function() {
+  var id = this.data("like-id");
+  if(!id) {
+    this.data("like-id", ++idCounter);
+    return idCounter;
+  }
+  return id;
+}
+
+// ** {{{ like.store(key[, value]) }}} **
+// 
+// Associate any kind of data with the curren DOM element
+proto.store = function(key, value) {
+  var id = this.id();
+  if(!storage[id]) {
+    storage[id] = {};
+  }
+  if(typeof value == "undefined") {
+    return storage[id][key];
+  }
+  storage[id][key] = value;
+  return this;
 }
 
 // ** {{{ like.here(dom) }}} **
@@ -280,9 +381,50 @@ proto.here = function(dom) {
   return new Like(dom);
 }
 
+function Wrapper(likeObj, els) {
+  this.parent = likeObj;
+  this.scope = likeObj.scope;
+  this.elements = els;
+}
+
+iterate(proto, function(fct, key) {
+  if(typeof fct == "function") {
+    Wrapper.prototype[key] = function wrapElements() {
+      var that = this, result;
+      var args = arguments;
+      iterate(that.elements, function execOne(el) {
+        var h = new Like(el);
+        result = fct.apply(h, args);
+      });
+      return result;
+    }
+  }
+});
+
+// methods with different implementation
+
+proto.el = function() {
+  return this.scope;
+}
+
+Wrapper.prototype.el = function(i) {
+  return this.elements[i];
+}
+
+Wrapper.prototype.iterate = function(fct) {
+  return iterate(this.elements, fct);
+}
+
+proto.wrapper = function(els) {
+  return new Wrapper(this, els);
+};
+
+
+var like = new Like(doc);
+
 // Export the module to the outside world
 if(!global.like) {
-  global.like = new Like(doc);
+  global.like = like;
 }
 
 }(this));
