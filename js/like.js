@@ -51,7 +51,7 @@ proto.iterate = iterate = function (obj, fct) {
   }
   if(obj.hasOwnProperty("length")) {
     for(i=0; i<obj.length; i++) {
-      if(fct(obj[i], i) === false) {
+      if(fct.apply(new Like(obj[i]), [obj[i], i]) === false) {
         // end of the iteration
         return false;
       }    
@@ -59,7 +59,7 @@ proto.iterate = iterate = function (obj, fct) {
   } else {
     for(i in obj) {
       if(obj.hasOwnProperty(i)) {
-        if(fct(obj[i], i) === false) {
+        if(fct.apply(new Like(obj[i]), [obj[i], i]) === false) {
           // end of the iteration
           return false;
         }

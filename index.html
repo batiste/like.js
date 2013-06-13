@@ -73,6 +73,8 @@ some benefits:</p>
 
   <h2>Example 1: a positive number behavior</h2>
 
+  <p>This first example illustrate the use of several events including 2 pseudo events.</p>
+
   <div class="html">
 <label>A positive number <input class="like-positive-number" value="wrong" /></label><br>
 <label id="inserted"></label>
@@ -80,12 +82,10 @@ some benefits:</p>
 
   <h3>HTML</h3>
 
-  <p>This first example illustrate the use of several events including 2 pseudo events. 
-    Events are separated by one space.</p>
-
   <pre class="lang-html prettyprint"></pre>
     
   <script>
+// Events are separated by one space
 like.a("positive-number", "keyup change likeInit likeInsert", function(dom, event) {
   var v = parseInt(dom.value, 10);
   if(v < 0 || isNaN(v)) {
@@ -99,6 +99,7 @@ like.a("positive-number", "keyup change likeInit likeInsert", function(dom, even
 like.byId("inserted").html('Same but inserted dynamically <input class="like-positive-number" value="-100" />');
   </script>
   <h3>Code</h3>
+
   <pre class="lang-js prettyprint"></pre>
 
 
@@ -269,6 +270,7 @@ like.a("range-number", "likeInit change keyup", function(dom, event) {
   if(dom.value != v) {
     dom.value = v;
   }
+  // quantityChanged is listened by the product-line behavior
   this.trigger("quantityChanged");
 });
 
@@ -277,13 +279,14 @@ like.a("product-line", "likeInit quantityChanged", function(dom, event) {
   quantity = parseInt(quantity, 10);
   price = parseFloat(this.byClass("price").html(), 10);
   this.byClass("total").html(roundCent(price * quantity));
+  // totalChanged is listened by the sum-table behavior
   this.trigger("totalChanged");
 });
 
 like.a("sum-table", "likeInit totalChanged", function(dom, event) {
   var grandTotal = 0;
   this.byClass("total").iterate(function(el) {
-    grandTotal += parseFloat(el.innerHTML, 10);
+    grandTotal += parseFloat(this.html(), 10);
   });
   this.byClass("grand-total").html(roundCent(grandTotal));
 });
