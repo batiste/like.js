@@ -7,7 +7,7 @@
 // some internal variables
 var hasClass, byId, byTag, byClass, iterate, 
   doc = global.document, proto,
-  // register of callback for organized this way
+  // The register of callback is organized this way:
   // {eventName:{className:callbacks}}
   eventRegister = {};
 
@@ -18,15 +18,18 @@ var hasClass, byId, byTag, byClass, iterate,
 // the dom parameter is left unspecified.
 // by default the scope is the document.
 function Like(scope) {
-  // classes that have the likeInsert event
+  // the scope of the Like object
   this.scope = scope || doc;
-  // shared global
+  // shared global that is exposed in every object
   this.register = eventRegister;
 }
 
 // a shortcut for the prototype
 proto = Like.prototype;
 
+// ** {{{ like.reset }}} **
+//
+// Reset the global event register. This is mainly used in the tests.
 proto.reset = function() {
   eventRegister = {};
   this.register = eventRegister;
@@ -81,7 +84,7 @@ proto.hasClass = hasClass = function (cls, dom) {
 
 // ** {{{ like.byId(Id) }}} **
 //
-// Return a DOM element given it's ID
+// Return a Like object scoped with the DOM element with the given ID.
 proto.byId = byId = function(id) {
   return new Like(doc.getElementById(id));}
 
@@ -89,7 +92,7 @@ proto.byId = byId = function(id) {
 //
 // Return a list of DOM element given a tag name.
 proto.byTag = byTag = function(tag, dom) {
-  return this.wrapper(
+  return this.collection(
     (dom || 
       this.scope).getElementsByTagName(tag));
 };
@@ -101,10 +104,10 @@ proto.byClass = byClass = function(cls, dom) {
   var d = dom || this.scope;
   // apparently faster
   if(d.getElementsByClassName) {
-    return this.wrapper(d.getElementsByClassName(cls))
+    return this.collection(d.getElementsByClassName(cls))
   };
   if(d.querySelectorAll) {
-    return this.wrapper(d.querySelectorAll("."+cls))
+    return this.collection(d.querySelectorAll("."+cls))
   };
   // < IE8
   var accu = [];
@@ -113,7 +116,7 @@ proto.byClass = byClass = function(cls, dom) {
       accu.push(el);
     }
   });
-  return this.wrapper(accu);
+  return this.collection(accu);
 };
 
 // ** {{{ like.listenTo(event, listener, dom) }}} **
@@ -381,15 +384,20 @@ proto.here = function(dom) {
   return new Like(dom);
 }
 
-function Wrapper(likeObj, els) {
+
+// ** {{{ Collection }}} **
+//
+// A collection of Like object that has a similar API as a Like object
+function Collection(likeObj, els) {
   this.parent = likeObj;
   this.scope = likeObj.scope;
   this.elements = els;
 }
 
+// copy the Like prototype in the Collection prototype
 iterate(proto, function(fct, key) {
   if(typeof fct == "function") {
-    Wrapper.prototype[key] = function wrapElements() {
+    Collection.prototype[key] = function wrapElements() {
       var that = this, result;
       var args = arguments;
       iterate(that.elements, function execOne(el) {
@@ -401,22 +409,22 @@ iterate(proto, function(fct, key) {
   }
 });
 
-// methods with different implementation
+// methods with different implementation between the Collection and the Like object
 
 proto.el = function() {
   return this.scope;
 }
 
-Wrapper.prototype.el = function(i) {
+Collection.prototype.el = function(i) {
   return this.elements[i];
 }
 
-Wrapper.prototype.iterate = function(fct) {
+Collection.prototype.iterate = function(fct) {
   return iterate(this.elements, fct);
 }
 
-proto.wrapper = function(els) {
-  return new Wrapper(this, els);
+proto.collection = function(els) {
+  return new Collection(this, els);
 };
 
 
