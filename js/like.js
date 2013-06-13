@@ -90,7 +90,7 @@ proto.byId = byId = function(id) {
 
 // ** {{{ like.byTag(tagName, dom) }}} **
 //
-// Return a list of DOM element given a tag name.
+// Return a Collection of DOM element given a tag name.
 proto.byTag = byTag = function(tag, dom) {
   return this.collection(
     (dom || 
@@ -99,7 +99,7 @@ proto.byTag = byTag = function(tag, dom) {
 
 // ** {{{ like.byClass(className, dom) }}} **
 //
-// Return a list of DOM element given a class name.
+// Return a Collection of DOM element given a class name.
 proto.byClass = byClass = function(cls, dom) {
   var d = dom || this.scope;
   // apparently faster
