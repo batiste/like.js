@@ -130,6 +130,7 @@ proto.listenTo = function (event, listener, dom) {
       return listener(e);
     });
   }
+  return this;
 };
 
 // ** {{{ like.addClass(className, dom) }}} **
@@ -140,6 +141,7 @@ proto.addClass = function(cls, dom) {
   if(!hasClass(cls, d)) {
     d.className = (d.className ? d.className + " " : "") + cls;
   }
+  return this;
 }
 
 // ** {{{ like.removeClass(className, dom) }}} **
@@ -152,6 +154,7 @@ proto.removeClass = function(cls, dom) {
   }
   var m = new RegExp("\\b" + cls + "\\b");
   d.className = d.className.replace(m, "");
+  return this;
 }
 
 // ** {{{ like.execute(event) }}} **
@@ -194,6 +197,7 @@ proto.execute = function(event, rainClass) {
     }
     target = target.parentNode;
   }
+  return this;
 }
 
 // ** {{{ like.rain(event) }}} **
@@ -212,6 +216,7 @@ proto.rain = function(event) {
       fct.call(new Like(el), el, event);
     });
   });
+  return this;
 };
 
 // ** {{{ like.trigger(eventName, options) }}} **
@@ -222,6 +227,7 @@ proto.trigger = function(eventName, opt) {
   var d = (opt && opt.dom) || this.scope;
   var evt = {type:eventName, target:d, preventDefault:function(){}};
   this.execute(evt, (opt && opt.rain));
+  return this;
 }
 
 // ** {{{ like.registerEvent(className, eventName, callback) }}} **
@@ -251,6 +257,7 @@ proto.registerEvent = function(className, eventName, callback) {
       });
     }
   }
+  return this;
 }
 
 // ** {{{ like.a(name, reactOn, obj) }}} **
@@ -278,6 +285,7 @@ proto.a = proto.an = function(name, reactOn, obj) {
       that.registerEvent("like-"+name, evt, obj);
     }
   });
+  return this;
 }
 
 // ** {{{ like.insert(html) }}} **
@@ -292,6 +300,7 @@ proto.html = function(html) {
   }
   d.innerHTML = html;
   this.rain({target:d, type:"likeInsert"});
+  return this;
 }
 
 // ** {{{ like.remove() }}} **
@@ -300,6 +309,7 @@ proto.html = function(html) {
 proto.remove = function() {
   var d = this.scope;
   d.parentNode.removeChild(d);
+  return this;
 }
 
 
@@ -323,7 +333,7 @@ proto.setData = function(key, value, dom) {
     return d.removeAttribute("data-" + key);
   }
   d.setAttribute("data-" + key, "json:"+JSON.stringify(value));
-  return value;
+  return this;
 }
 
 // ** {{{ like.getData(key) }}} **
@@ -343,7 +353,8 @@ var storage = {};
 proto.id = function() {
   var id = this.data("like-id");
   if(!id) {
-    return this.data("like-id", ++idCounter);
+    this.data("like-id", ++idCounter);
+    return idCounter;
   }
   return id;
 }
@@ -360,6 +371,7 @@ proto.store = function(key, value) {
     return storage[id][key];
   }
   storage[id][key] = value;
+  return this;
 }
 
 // ** {{{ like.here(dom) }}} **
