@@ -198,11 +198,36 @@ test("rain2", function() {
 
 });
 
+test("multiple events", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span class='like-a'></span>";
+    document.body.appendChild(d);
+
+    var div = like.here(d);
+
+    var aCalled = false;
+    like.a("a", "click", function(){aCalled=true});
+
+    var bCalled = false;
+    like.a("a", "click", function(){bCalled=true});
+
+    div.rain({type:"click"});
+
+    equal(bCalled, true);
+    equal(aCalled, true);
+
+    div.remove();
+    like.reset();
+
+});
+
+
 test("reset", function() {
 
     var called = false;
     like.a("a", "click", function(){called=true});
-    equal(typeof like.register.click["like-a"], "function");
+    equal(typeof like.register.click["like-a"][0], "function");
     like.reset();
     equal(like.register["click"], undefined);
 

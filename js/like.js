@@ -212,14 +212,15 @@ proto.execute = function(event, rainClass) {
 // in the current scope that matches the given event.
 
 proto.rain = function(event) {
-  var d = this.scope;
-  d = this.here(d);
-  iterate(eventRegister[event.type], function(fct, cls) {
-    if(hasClass(cls, d)) {
-      fct.call(new Like(d), d, event);
-    }
-    d.byClass(cls).iterate(function(el) {
-      fct.call(new Like(el), el, event);
+  var d = this.here(this.scope);
+  iterate(eventRegister[event.type], function(callbacks, cls) {
+    iterate(callbacks, function(fct) {
+      if(hasClass(cls, d)) {
+        fct.call(new Like(d), d, event);
+      }
+      d.byClass(cls).iterate(function(el) {
+        fct.call(new Like(el), el, event);
+      });
     });
   });
   return this;
