@@ -186,11 +186,14 @@ proto.execute = function(event, rainClass) {
     complete = iterate(target.className.split(" "), function(cls) {
       if(cls.indexOf("like-") == 0) {
         if(evr[cls]) {
-           fun = evr[cls];
-           ret = fun.call(new Like(target), target, event);
-           if(ret === false) {
-              event.preventDefault();
-           }
+           var ret;
+           iterate(evr[cls], function(callback) {
+             ret = callback.call(new Like(target), target, event);
+             if(ret === false) {
+               event.preventDefault();
+               return;
+             }
+           });
            return ret;
         }
       }
@@ -242,24 +245,26 @@ proto.trigger = function(eventName, opt) {
 // * **eventName**  The event name
 // * **callback**   Callback defined by the user
 proto.registerEvent = function(className, eventName, callback) {
-  var signature = className + "|" + eventName, that=this;
+  var that=this;
   var evr = eventRegister[eventName];
   if(!evr) {
     evr = eventRegister[eventName] = {};
   }
-  // only one class by type of event
   if(!evr[className]) {
-    function listener(e) {
-      return that.execute(e);
-    }
-    this.listenTo(eventName, listener);
-    evr[className] = callback;
-    if(eventName == "likeInit") {
-      iterate(that.byClass(className).elements, function(el) {
-        callback.call(new Like(el), el, {type:"likeInit", target:el});
-      });
-    }
+    evr[className] = []; 
   }
+  
+  function listener(e) {
+    return that.execute(e);
+  }
+  this.listenTo(eventName, listener);
+  evr[className].push(callback);
+  if(eventName == "likeInit") {
+    iterate(that.byClass(className).elements, function(el) {
+      callback.call(new Like(el), el, {type:"likeInit", target:el});
+    });
+  }
+  
   return this;
 }
 
@@ -274,8 +279,10 @@ proto.registerEvent = function(className, eventName, callback) {
 proto.a = proto.an = function(name, reactOn, obj) {
   var that=this, key;
   if(typeof reactOn == "object") {
-    iterate(reactOn, function(fct, evt) {
+    iterate(reactOn, function(fct, evts) {
+      iterate(evts.split(/[\s]+/), function(evt) {
         that.registerEvent("like-"+name, evt, fct);
+      });
     });
     return;
   }
@@ -385,7 +392,6 @@ proto.here = function(dom) {
   return new Like(dom);
 }
 
-
 // ** {{{ Collection }}} **
 //
 // Create a collection of Like object from a list
@@ -438,4 +444,3 @@ if(!global.like) {
 }
 
 }(this));
-
