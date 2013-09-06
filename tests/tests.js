@@ -223,6 +223,31 @@ test("multiple events", function() {
 });
 
 
+test("multiple class doesn't trigger things twice", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span class='like-ab'></span><span class='like-ac'></span>";
+    document.body.appendChild(d);
+
+    var div = like.here(d);
+
+    var aCalled = 0;
+    like.a("ab", "click", function(){aCalled=aCalled+1});
+
+    var bCalled = 0;
+    like.a("ac", "click", function(){bCalled=bCalled+1});
+
+    div.rain({type:"click"});
+
+    equal(bCalled, 1);
+    equal(aCalled, 1);
+
+    div.remove();
+    like.reset();
+
+});
+
+
 test("reset", function() {
 
     var called = false;
@@ -232,6 +257,49 @@ test("reset", function() {
     equal(like.register["click"], undefined);
 
 });
+
+
+test("int attributes", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span id='t2' data-test='int:89' />";
+    document.body.appendChild(d);
+
+    var el = like.here(d).byId("t2");
+
+    equal(el.data("test"), 89);
+    equal(typeof el.data("test"), "number");
+
+    like.here(d).remove();
+
+});
+
+test("json attributes", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span id='t2' data-test='json:{\"a\":1, \"b\":2}' />";
+    document.body.appendChild(d);
+
+    var el = like.here(d).byId("t2");
+
+    equal(el.data("test").b, 2);
+    equal(el.data("test").a, 1);
+
+    like.here(d).remove();
+
+});
+
+test("clone", function() {
+
+    var a = {b:2, v:[1,2,3]};
+    var b = like.clone(a);
+
+    equal(a.v[0], b.v[0]);
+    a.v[0] = 2
+    notEqual(a.v[0], b.v[0]);
+
+});
+
 
 test("hasClass", function() {
 

@@ -374,6 +374,9 @@ proto.getData = function(key, dom) {
   if(v && v.indexOf("json:") === 0) {
     return JSON.parse(v.slice(5));
   }
+  if(v && v.indexOf("int:") === 0) {
+    return parseInt(v.slice(4), 10);
+  }
   return v;
 }
 
