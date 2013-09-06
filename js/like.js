@@ -31,6 +31,11 @@ proto = Like.prototype;
 //
 // Reset the global event register. This is mainly used in the tests.
 proto.reset = function() {
+  iterate(eventRegister, function(classes, eventName) {
+    iterate(classes, function(listener, cls) {
+      document.body.removeEventListener(eventName, listener, false);
+    });  
+  });
   eventRegister = {};
   this.register = eventRegister;
 }
@@ -263,20 +268,24 @@ proto.trigger = function(eventName, opt) {
 // * **eventName**  The event name
 // * **callback**   Callback defined by the user
 proto.registerEvent = function(className, eventName, callback) {
+  console.log(className, eventName);
   var that=this;
   var evr = eventRegister[eventName];
   if(!evr) {
-    evr = eventRegister[eventName] = {};
+    eventRegister[eventName] = {};
+    evr = eventRegister[eventName];
+    console.log(className, eventName, callback)
+    function listener(e) {
+      return that.execute(e);
+    }
+    this.listenTo(eventName, listener);
   }
   if(!evr[className]) {
     evr[className] = []; 
   }
   
-  function listener(e) {
-    return that.execute(e);
-  }
-  this.listenTo(eventName, listener);
   evr[className].push(callback);
+  
   if(eventName == "likeInit") {
     iterate(that.byClass(className).elements, function(el) {
       callback.call(new Like(el), el, {type:"likeInit", target:el});
@@ -302,7 +311,7 @@ proto.a = proto.an = function(name, reactOn, obj) {
         that.registerEvent("like-"+name, evt, fct);
       });
     });
-    return;
+    return this;
   }
   iterate(reactOn.split(/[\s]+/), function(evt) {
     if(typeof obj == "object") {
@@ -310,6 +319,7 @@ proto.a = proto.an = function(name, reactOn, obj) {
         that.registerEvent("like-"+name, evt, obj[evt]);
       }
     } else {
+      console.log("OKI", name)
       that.registerEvent("like-"+name, evt, obj);
     }
   });

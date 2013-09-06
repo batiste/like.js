@@ -63,34 +63,7 @@ test("store", function() {
 });
 
 
-test("trigger", function() {
-    stop();
 
-    var d = document.createElement("div");
-    d.innerHTML = "<span class='like-local like-global'></span>";
-    document.body.appendChild(d);
-    var span = like.here(d).byTag("span");
-    
-    var local, global;
-    like.a("local", "local", function(dom, event){
-      local=true;
-    });
-    like.a("global", "global", function(dom, event){
-      global=true;
-    });
-
-    span.trigger("local");
-    like.trigger("global", {rain:document});
-
-    setTimeout(function() {
-      ok(local, "Custom local event should be called");
-      ok(local, "Custom global event should be called");
-      like.here(d).remove();
-      like.reset();
-      start();
-    }, 20);
-
-});
 
 
 test("wrapper", function() {
@@ -225,22 +198,48 @@ test("multiple events", function() {
 
 test("multiple class doesn't trigger things twice", function() {
 
+    like.reset();
+  
     var d = document.createElement("div");
-    d.innerHTML = "<span class='like-ab'></span><span class='like-ac'></span>";
+    d.innerHTML = "<span class='like-a-b'></span><span class='like-a-c'></span>";
     document.body.appendChild(d);
 
     var div = like.here(d);
 
-    var aCalled = 0;
-    like.a("ab", "click", function(){aCalled=aCalled+1});
-
-    var bCalled = 0;
-    like.a("ac", "click", function(){bCalled=bCalled+1});
+    var abCalled = 0;
+    var acCalled = 0;
+    
+    like.a("a-b", "click", function(){abCalled=abCalled+1});  
+    like.a("a-c", "click", function(){acCalled=acCalled+1});
 
     div.rain({type:"click"});
 
-    equal(bCalled, 1);
-    equal(aCalled, 1);
+    equal(abCalled, 1);
+    equal(acCalled, 1);
+    
+    function eventFire(el, etype) {
+      if (el.fireEvent) {
+        (el.fireEvent('on' + etype));
+      } else {
+        var evObj = document.createEvent('Events');
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
+      }
+    }
+    
+    var abCalled = 0;
+    var acCalled = 0;
+    
+    eventFire(d.childNodes[0], "click");
+    equal(abCalled, 1);
+    equal(acCalled, 0);
+
+    var abCalled = 0;
+    var acCalled = 0;
+    
+    eventFire(d.childNodes[1], "click");
+    equal(abCalled, 0);
+    equal(acCalled, 1);
 
     div.remove();
     like.reset();
@@ -255,6 +254,7 @@ test("reset", function() {
     equal(typeof like.register.click["like-a"][0], "function");
     like.reset();
     equal(like.register["click"], undefined);
+    like.reset();
 
 });
 
@@ -271,6 +271,7 @@ test("int attributes", function() {
     equal(typeof el.data("test"), "number");
 
     like.here(d).remove();
+    like.reset();
 
 });
 
@@ -286,6 +287,7 @@ test("json attributes", function() {
     equal(el.data("test").a, 1);
 
     like.here(d).remove();
+    like.reset();
 
 });
 
@@ -358,6 +360,38 @@ test("addClass / removeClass", function() {
     equal(el.scope.className, "");
 
     like.here(d).remove();
+    like.reset();
+
+});
+
+
+test("trigger", function() {
+    stop();
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span class='like-local like-global'></span>";
+    document.body.appendChild(d);
+    var span = like.here(d).byTag("span");
+    
+    var local, global;
+    like.a("local", "local", function(dom, event) {
+      local=true;
+    });
+    like.a("global", "global", function(dom, event) {
+      global=true;
+    });
+
+    span.trigger("local");
+    like.trigger("global", {rain:document});
+
+    /*setTimeout(function() {
+      ok(local, "Custom local event should be called");
+      ok(local, "Custom global event should be called");
+      like.here(d).remove();
+      like.reset();
+      start();
+    }, 20);*/
+    
     like.reset();
 
 });
