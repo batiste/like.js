@@ -119,6 +119,16 @@ proto.byClass = byClass = function(cls, dom) {
   return this.collection(accu);
 };
 
+// ** {{{ like.query }}} **
+//
+// Return a Collection of DOM element that matche the given query.
+// document.querySelectorAll has to be implemented.
+proto.query = function(query, dom) {
+  return this.collection(
+    (dom || 
+      this.scope).querySelectorAll(query));
+}
+
 // ** {{{ like.listenTo(event, listener, dom) }}} **
 //
 // Listen to a particuliar even in a cross browser way.
@@ -158,6 +168,13 @@ proto.removeClass = function(cls, dom) {
   var m = new RegExp("\\b" + cls + "\\b");
   d.className = d.className.replace(m, "");
   return this;
+}
+
+// ** {{{ like.clone(obj) }}} **
+//
+// Clone an object.
+proto.clone = function(obj) {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 // ** {{{ like.execute(event) }}} **
