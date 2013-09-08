@@ -343,6 +343,21 @@ proto.html = proto.html = function(html) {
   return this;
 }
 
+// ** {{{ like.text(text) }}} **
+// 
+// Insert some text into a DOM element.
+// 
+// * **text**      text string
+proto.text = proto.text = function(text) {
+  var d = this.scope;
+  if(text === undefined) {
+    return d.textContent;
+  }
+  d.innerHTML = "";
+  d.appendChild(document.createTextNode(text));
+  return this;
+}
+
 // ** {{{ like.remove() }}} **
 //
 // Remove the dom element.
@@ -443,18 +458,19 @@ iterate(proto, function(fct, key) {
       iterate(that.elements, function execOne(el) {
         var h = new Like(el);
         result = fct.apply(h, args);
+        
       });
       return result;
     }
   }
 });
 
-// methods with different implementation between the Collection and the Like object
-
+// avoid to copy this function
 proto.el = function() {
   return this.scope;
 }
 
+// methods with different implementation between the Collection and the Like object
 Collection.prototype.el = function(i) {
   return this.elements[i];
 }
@@ -467,10 +483,10 @@ proto.collection = function(els) {
   return new Collection(this, els);
 };
 
-
+// the like module is simply an instance of Like with document as the scope.
 var like = new Like(doc);
 
-// Export the module to the outside world
+// export the module to the outside world
 if(!global.like) {
   global.like = like;
 }

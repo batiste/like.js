@@ -105,6 +105,25 @@ test("html", function() {
  
 });
 
+test("text", function() {
+
+    var d = document.createElement("div");
+    document.body.appendChild(d);
+    d = like.here(d);
+
+    d.html("<span>HELLO <span>WORLD</span></span>");
+
+    equal("HELLO WORLD", d.text());
+    
+    d.text("NOP");
+
+    equal("NOP", d.text());
+
+    d.remove();
+    like.reset();
+ 
+});
+
 test("byClass chaining", function() {
 
     var d = document.createElement("div");
@@ -405,3 +424,30 @@ test("trigger", function() {
     like.reset();
 
 });
+
+
+
+test("collection", function() {
+
+    var d = document.createElement("div");
+    d.innerHTML = "<span class='like-c2'></span><span id='test' class='like-c2'></span><span></span>";
+    document.body.appendChild(d);
+    var span = like.here(d).byTag("span");
+
+    equal(3, span.elements.length);
+    span.text("hello");
+    equal(like.here(span.elements[0].childNodes[0]).text(), "hello");
+    equal(like.here(span.elements[1].childNodes[0]).text(), "hello");
+
+    var test = span.byId("test");
+    equal("test", test.scope.id);
+
+    var test = span.byClass("like-c2");
+    equal(2, test.elements.length);
+
+    like.here(d).remove();    
+    like.reset();
+
+});
+
+
