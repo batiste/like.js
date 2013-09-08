@@ -209,8 +209,18 @@ test("multiple class doesn't trigger things twice", function() {
     var abCalled = 0;
     var acCalled = 0;
     
-    like.a("a-b", "click", function(){abCalled=abCalled+1});  
-    like.a("a-c", "click", function(){acCalled=acCalled+1});
+    like.a("a-b", "click", function(dom, event){
+      abCalled=abCalled+1
+    });
+
+    equal(like.register["click"]["like-a-b"].length, 1, "only one callback registered");
+  
+    like.a("a-c", "click", function(dom, event){
+      acCalled=acCalled+1
+    });
+
+    equal(like.register["click"]["like-a-b"].length, 1, "only one callback registered");
+    equal(like.register["click"]["like-a-c"].length, 1, "only one callback registered");
 
     div.rain({type:"click"});
 
@@ -231,15 +241,15 @@ test("multiple class doesn't trigger things twice", function() {
     var acCalled = 0;
     
     eventFire(d.childNodes[0], "click");
-    equal(abCalled, 1);
-    equal(acCalled, 0);
+    equal(abCalled, 1, "should be triggered once");
+    equal(acCalled, 0, "should not be triggered");
 
     var abCalled = 0;
     var acCalled = 0;
     
     eventFire(d.childNodes[1], "click");
-    equal(abCalled, 0);
-    equal(acCalled, 1);
+    equal(abCalled, 0, "should not be triggered");
+    equal(acCalled, 1, "should be triggered once");
 
     div.remove();
     like.reset();
@@ -384,13 +394,13 @@ test("trigger", function() {
     span.trigger("local");
     like.trigger("global", {rain:document});
 
-    /*setTimeout(function() {
+    setTimeout(function() {
       ok(local, "Custom local event should be called");
       ok(local, "Custom global event should be called");
       like.here(d).remove();
       like.reset();
       start();
-    }, 20);*/
+    }, 50);
     
     like.reset();
 

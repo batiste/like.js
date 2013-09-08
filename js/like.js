@@ -31,10 +31,9 @@ proto = Like.prototype;
 //
 // Reset the global event register. This is mainly used in the tests.
 proto.reset = function() {
-  iterate(eventRegister, function(classes, eventName) {
-    iterate(classes, function(listener, cls) {
-      document.body.removeEventListener(eventName, listener, false);
-    });  
+  // remove all different events
+  iterate(listenCache, function(evt, i) {
+    evt.dom.removeEventListener(evt.event, evt.listener, false);
   });
   eventRegister = {};
   this.register = eventRegister;
@@ -137,8 +136,11 @@ proto.query = function(query, dom) {
 // ** {{{ like.listenTo(event, listener, dom) }}} **
 //
 // Listen to a particuliar even in a cross browser way.
+var listenCache = [];
+
 proto.listenTo = function (event, listener, dom) {
   var d = dom || this.scope;
+  listenCache.push({dom:d, listener:listener, event:event});
   if(d.addEventListener) {
     d.addEventListener(event, listener, false);
   } else if(d.attachEvent) {
@@ -268,17 +270,17 @@ proto.trigger = function(eventName, opt) {
 // * **eventName**  The event name
 // * **callback**   Callback defined by the user
 proto.registerEvent = function(className, eventName, callback) {
-  console.log(className, eventName);
   var that=this;
   var evr = eventRegister[eventName];
+  // we want only one listener by event type
   if(!evr) {
     eventRegister[eventName] = {};
     evr = eventRegister[eventName];
-    console.log(className, eventName, callback)
     function listener(e) {
       return that.execute(e);
     }
-    this.listenTo(eventName, listener);
+    // we listen only on the document (for now)
+    this.here(document).listenTo(eventName, listener);
   }
   if(!evr[className]) {
     evr[className] = []; 
@@ -319,7 +321,6 @@ proto.a = proto.an = function(name, reactOn, obj) {
         that.registerEvent("like-"+name, evt, obj[evt]);
       }
     } else {
-      console.log("OKI", name)
       that.registerEvent("like-"+name, evt, obj);
     }
   });
